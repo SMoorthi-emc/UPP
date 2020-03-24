@@ -17,8 +17,8 @@ if [ $mac2 = ga ] ; then                         # For GAEA
  machine=gaea
  center=${center:-ncep}
  make_nowrf=${make_nowrf:-YES}                   # to compile with wrf stub instead of WRF lib
-elif [ $mac2 = tf ] ; then                       # For Theia
- machine=theia
+elif [ $mac2 = hf ] ; then                       # For hera
+ machine=hera
  make_nowrf=${make_nowrf:-YES}                   # to compile with wrf stub instead of WRF lib
 elif [ $mac = t -o $mac = e -o $mac = g ] ; then # For WCOSS
  machine=wcoss
@@ -122,13 +122,13 @@ elif [ $machine = wcoss_d ] ; then
   export TRAPS=""
   export PROFILE=""
   export OMPFLG="-qopenmp"
-elif [ $machine = theia ] ; then
+elif [ $machine = hera ] ; then
 # export NETCDFPATH="/apps/netcdf/4.3.0-intel"
-# export WRFPATH="/scratch4/NCEPDEV/meso/save/Dusan.Jovic/WRFV3"
-  export WRFPATH="/scratch4/NCEPDEV/global/save/Shrinivas.Moorthi/theia/nceplibs/nwprod/lib/sorc/WRFV3"
+# export WRFPATH="/scratch1/NCEPDEV/meso/save/Dusan.Jovic/WRFV3"
+  export WRFPATH="/scratch1/NCEPDEV/global/save/Shrinivas.Moorthi/hera/nceplibs/nwprod/lib/sorc/WRFV3"
   export NETCDF=/apps/netcdf/4.3.0-intel
 
-# export NWPROD="/scratch4/NCEPDEV/global/save/Shrinivas.Moorthi/theia/nceplibs/nwprod"
+# export NWPROD="/scratch1/NCEPDEV/global/save/Shrinivas.Moorthi/hera/nceplibs/nwprod"
 # export ipv=_v2.0.3
 # export spv=""
 ##export spv=_v2.0.1
@@ -163,19 +163,19 @@ elif [ $machine = theia ] ; then
   export ARCH=""
   export CPPFLAGS="-DLINUX"
   if [ $debug = YES ] ; then
-    export OPTS="-O0 -openmp -g"
+    export OPTS="-O0 -qopenmp -g"
     export DEBUG="-g -check all -ftrapuv -convert big_endian -fp-stack-check -fstack-protector -heap-arrays -recursive -traceback"
   else
-    export export OPTS="-O3 -convert big_endian -traceback -g -fp-model source -openmp"
+    export export OPTS="-O3 -convert big_endian -traceback -g -fp-model source -qopenmp"
 #   export export OPTS="-O2 -convert big_endian -traceback -g -fp-model source "
-#   export export OPTS="-O2 -convert big_endian -traceback -g -fp-model source -openmp"
+#   export export OPTS="-O2 -convert big_endian -traceback -g -fp-model source -qopenmp"
     export DEBUG=""
   fi
   export LIST=""
   export FREE="-FR"
   export TRAPS=""
   export PROFILE=""
-  export OMPFLG="-openmp"
+  export OMPFLG="-qopenmp"
 elif [ $machine = gaea ] ; then
   export gaea_c=${gaea_c:-c3}
   . $MODULESHOME/init/sh 2>/dev/null
@@ -281,7 +281,7 @@ export spv=${spv:-""}
 if [ ${CLEAN:-YES}  = YES ] ; then make -f Makefile_new$BMPYXML clean ; fi
 
 export CFLAGS="-DLINUX -Dfunder -DFortranByte=char -DFortranInt=int -DFortranLlong='long long'"
-if [ $machine = wcoss_c -o $machine = wcoss_d -o $machine = theia -o $machine = gaea ] ; then
+if [ $machine = wcoss_c -o $machine = wcoss_d -o $machine = hera -o $machine = gaea ] ; then
  if [ $make_nowrf = YES ] ; then
   export WRF_INC=""
   export WRF_LIB=""
@@ -290,7 +290,7 @@ if [ $machine = wcoss_c -o $machine = wcoss_d -o $machine = theia -o $machine = 
   export WRF_LIB="${WRFPATH}/main/libwrflib.a ${WRFPATH}/frame/pack_utils.o ${WRFPATH}/frame/module_internal_header_util.o ${WRFPATH}/external/io_grib1/libio_grib1.a ${WRFPATH}/external/io_grib_share/libio_grib_share.a ${WRFPATH}/external/io_int/libwrfio_int.a ${WRFPATH}/external/io_netcdf/libwrfio_nf.a ${WRFPATH}/external/esmf_time_f90/libesmf_time.a ${WRFPATH}/external/RSL_LITE/librsl_lite.a"
  fi
  NETCDF_LIB="${NETCDF}/lib/libnetcdf.a"
- export FFLAGS="${OPTS} ${FREE} ${TRAPS} ${DEBUG} ${WRF_INC} -I${XMLPARSE_INC} -I${G2_INC4} -I${G2TMPL_INC} -I${NEMSIO_INC} -I${SIGIO_INC4} -I${SFCIO_INC4} -I${GFSIO_INC4} -I${W3EMC_INC4} -I${CRTM_INC} ${NETCDF_INCLUDE} -I${PNG_INC}"
+ export FFLAGS="${OPTS} ${FREE} ${TRAPS} ${DEBUG} ${WRF_INC} -I${XMLPARSE_INC} -I${G2_INC4} -I${G2TMPL_INC} -I${NEMSIO_INC} -I${SIGIO_INC4} -I${SFCIO_INC4} -I${GFSIO_INC4} -I${W3EMC_INC4} -I${CRTM_INC} -I${NETCDF_INC} -I${PNG_INC}"
 
 #export FFLAG="${OPTS} -fixed ${TRAPS} ${DEBUG} ${WRF_INC} -I${XMLPARSE_INC} -I${G2_INC4} -I${G2TMPL_INC} -I${NEMSIO_INC} -I${SIGIO_INC4} -I${SFCIO_INC4} -I${GFSIO_INC4} -I${W3EMC_INC4} -I${CRTM_INC} ${NETCDF_INCLUDE} -I${PNG_INC}"
 

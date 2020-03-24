@@ -530,7 +530,42 @@ $ERRSCRIPT||exit 2
 # Filter SLP and 500 mb height using copygb, change GRIB ID, and then
 # cat the filtered fields to the pressure GRIB file, from Iredell
 
+<<<<<<< HEAD
 if [ $FILTER = "1" ] ; then
+=======
+if [ $GRIBVERSION = grib1 ]; then
+  $COPYGB -x -i'4,0,80' -k'4*-1,1,102' $PGBOUT tfile
+  ln -s -f tfile fort.11
+  ln -s -f prmsl fort.51
+  echo 0 2|$OVERPARMEXEC
+  $COPYGB -x -i'4,1,5' -k'4*-1,7,100,500' $PGBOUT tfile
+  ln -s -f tfile fort.11
+  ln -s -f h5wav fort.51
+  echo 0 222|$OVERPARMEXEC
+
+#cat $PGBOUT prmsl h5wav >> $PGBOUT
+  cat  prmsl h5wav >> $PGBOUT
+
+elif [ $GRIBVERSION = grib2 ]; then
+  if [ ${ens} = YES ] ; then
+    $COPYGB2 -x -i'4,0,80' -k'1 3 0 7*-9999 101 0 0' $PGBOUT tfile
+  else
+    $COPYGB2 -x -i'4,0,80' -k'0 3 0 7*-9999 101 0 0' $PGBOUT tfile
+  fi
+  $WGRIB2 tfile -set_byte 4 11 1 -grib prmsl
+  if [ ${ens} = YES ] ; then
+    $COPYGB2 -x -i'4,1,5' -k'1 3 5 7*-9999 100 0 50000' $PGBOUT tfile
+  else
+    $COPYGB2 -x -i'4,1,5' -k'0 3 5 7*-9999 100 0 50000' $PGBOUT tfile
+  fi
+  $WGRIB2 tfile -set_byte 4 11 193 -grib h5wav
+
+#cat $PGBOUT prmsl h5wav >> $PGBOUT
+
+  cat  prmsl h5wav >> $PGBOUT
+
+fi
+>>>>>>> develop
 
   if [ $GRIBVERSION = grib1 ] ; then
     copygb=${COPYGB:-$EXECUTIL/copygb}

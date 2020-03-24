@@ -224,6 +224,7 @@
     integer,allocatable :: grbmsglen(:)
     real,   allocatable :: datafld(:,:)
     real,   allocatable :: datafldtmp(:)
+    logical, parameter  :: debugprint = .false.
 !
     character(1), allocatable :: cgrib(:)
 !   character(1) cgrib(max_bytes)
@@ -424,8 +425,10 @@
 !     write(0,*)' calling gengrb2msg for cstart=',cstart,' clength=',clength
 !
        else
-         print *,'WRONG, could not find ',trim(pset%param(nprm)%pname), &
-                 " in WMO and NCEP table!"
+         if(debugprint) then
+           print *,'WRONG, could not find ',trim(pset%param(nprm)%pname), &
+                   " in WMO and NCEP table!"
+         endif
 !!!         call mpi_abort()
        endif
 !
@@ -920,12 +923,12 @@
        call get_g2_sec5packingmethod(pset%packing_method,idrsnum,ierr)
        if(maxval(datafld1) == minval(datafld1))then
          idrsnum = 0
-         print*,' changing to simple packing for constant fields'
+!        print*,' changing to simple packing for constant fields'
        end if 
        if(modelname=='RAPR') then
          if((abs(maxval(datafld1)-minval(datafld1)) < 1.1) .and. (datafld1(1) > 500.0))then
            idrsnum = 0
-           print*,' changing to simple packing for constant fields: max-min < 0.1'
+!          print*,' changing to simple packing for constant fields: max-min < 0.1'
          end if
 
          if(trim(pset%param(nprm)%shortname)=='UGRD_ON_SPEC_HGT_LVL_ABOVE_GRND_10m'.or.&
@@ -936,7 +939,7 @@
             trim(pset%param(nprm)%shortname)=='VUCSH_ON_SPEC_HGT_LVL_ABOVE_GRND_0-6km'.or.&
             trim(pset%param(nprm)%shortname)=='VVCSH_ON_SPEC_HGT_LVL_ABOVE_GRND_0-6km')then
             idrsnum=0
-            print*,' changing to simple packing for field: ',trim(pset%param(nprm)%shortname)
+!            print*,' changing to simple packing for field: ',trim(pset%param(nprm)%shortname)
          endif
        endif
 
@@ -1230,7 +1233,7 @@
 !     
 !***** set up gds kpds to call Boi's code
 !
-      use CTLBLK_mod,  only : im,jm,gdsdegr
+      use CTLBLK_mod,  only : im,jm,gdsdegr,modelname
       use gridspec_mod, only: DXVAL,DYVAL,CENLAT,CENLON,LATSTART,LONSTART,LATLAST,     &
      &                        LONLAST,MAPTYPE,STANDLON,latstartv,cenlatv,lonstartv,    &
      &                        cenlonv,TRUELAT1,TRUELAT2,LATSTART_R,LONSTART_R,         &
@@ -1243,7 +1246,7 @@
       integer(4),intent(out)   :: ifield3len
       integer(4),intent(inout) :: ifield3(len3),igds(5)
     
-       print *,'in getgds, im=',im,'jm=',jm,'latstart=',latstart,'lonsstart=',lonstart,'maptyp=',maptype
+!       print *,'in getgds, im=',im,'jm=',jm,'latstart=',latstart,'lonsstart=',lonstart,'maptyp=',maptype
 !
 !** set up igds 
       igds(1) = 0      !Source of grid definition (see Code Table 3.0)
@@ -1263,6 +1266,11 @@
        ifield3(10) = latstart   !latitude of first grid point
        ifield3(11) = lonstart   !longitude of first grid point
        ifield3(12) = 8          !Resolution and component flags
+! Jili Dong change grid to earth relative 
+       if (modelname == 'FV3R') then
+         ifield3(12) = 0          !Resolution and component flags
+       endif
+
        ifield3(13) = TRUELAT1
        ifield3(14) = STANDLON   !longitude of meridian parallel to y-axis along which latitude increases
        ifield3(15) = DXVAL
@@ -1384,7 +1392,12 @@
        ifield3(12) = latstart_r   !latitude of first grid point
        ifield3(13) = lonstart_r   !longitude of first grid point
        ifield3(14) = 56           !Resolution and component flags
-       ifield3(15) = latlast_r    !latitude of last grid point
+! Jili Dong change grid to earth relative (Matt Pyle)
+       if(modelname=='FV3R') then
+         ifield3(14) = 48         !Resolution and component flags
+       endif
+
+       ifield3(15) = latlast_r    !latitude of last grid point 
        ifield3(16) = lonlast_r    !longitude of last grid point
        ifield3(17) = DXVAL
        ifield3(18) = DYVAL
@@ -1414,6 +1427,11 @@
        ifield3(16) = lonlast 
        ifield3(17) = NINT(360./(IM)*1000000.)
        ifield3(18) = NINT(JM/2.0)
+       if( latstart < latlast ) then
+        ifield3(19) = 64      !for SN scan
+       else
+        ifield3(19) = 0       !for NS scan
+       endif
 !
 !** Latlon grid
       ELSE IF(MAPTYPE == 0 ) THEN

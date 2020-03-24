@@ -43,11 +43,11 @@
 !$$$  
 !
       use vrbls3d, only: pint
-      use vrbls2d, only: albedo, avgalbedo, albase, mxsnal, sst, ths, epsr
+      use vrbls2d, only: albedo, avgalbedo, albase, mxsnal, sst, ths, epsr, ti
       use masks, only: gdlat, gdlon, sm, sice, lmh, lmv
       use params_mod, only: small, p1000, capa
       use lookup_mod, only: ITB,JTB,ITBQ,JTBQ
-      use ctlblk_mod, only: jsta, jend, grib, cfld, fld_info, datapd, spval, tsrfc,&
+      use ctlblk_mod, only: jsta, jend, modelname, grib, cfld, fld_info, datapd, spval, tsrfc,&
               ifhr, ifmin, lm, im, jm
       use rqstfld_mod, only: iget, lvls, iavblfld, id
 !- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -310,11 +310,15 @@
 !$omp parallel do private(i,j)
          DO J=JSTA,JEND
            DO I=1,IM
-             IF( (abs(SM(I,J)-1.) < 1.0E-5) ) THEN
-               GRID1(I,J) = SST(I,J)
+             IF (MODELNAME == 'NMM') THEN
+               IF( (abs(SM(I,J)-1.) < 1.0E-5) ) THEN
+                 GRID1(I,J) = SST(I,J)
+               ELSE
+                 GRID1(I,J) = THS(I,J)*(PINT(I,J,LM+1)/P1000)**CAPA
+               END IF  
              ELSE
-               GRID1(I,J) = THS(I,J)*(PINT(I,J,LM+1)/P1000)**CAPA
-             END IF  
+               GRID1(I,J) = SST(I,J)
+             ENDIF
            ENDDO
          ENDDO
          ID(1:25) = 0
@@ -324,6 +328,23 @@
           cfld=cfld+1
           fld_info(cfld)%ifld=IAVBLFLD(IGET(151))
           datapd(1:im,1:jend-jsta+1,cfld)=GRID1(1:im,jsta:jend)
+         endif
+      ENDIF
+
+!
+!     SEA ICE SKIN TEMPERAURE.
+      IF (IGET(968).GT.0) THEN
+!$omp parallel do private(i,j)
+         DO J=JSTA,JEND
+           DO I=1,IM
+             GRID1(I,J) = TI(I,J)
+           ENDDO
+         ENDDO
+         ID(1:25) = 0
+         if(grib=='grib2') then
+           cfld=cfld+1
+           fld_info(cfld)%ifld=IAVBLFLD(IGET(968))
+           datapd(1:im,1:jend-jsta+1,cfld)=GRID1(1:im,jsta:jend)
          endif
       ENDIF
 
