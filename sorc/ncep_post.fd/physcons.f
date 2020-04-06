@@ -8,8 +8,8 @@ module physcons_post
 !  1990/04/30: g and rd are made consistent with NWS usage.
 !  2001/10/22: g made consistent with SI usage.
 !  Math constants
-!  real(kind=kind_phys),parameter:: con_pi      =3.141593e+0 ! pi
-  real(kind=kind_phys),parameter:: con_pi     =4.0d0*atan(1.0d0)
+! real(kind=kind_phys),parameter:: con_pi      =3.141593e+0 ! pi
+  real(kind=kind_phys),parameter:: con_pi      =4.0d0*atan(1.0d0)
   real(kind=kind_phys),parameter:: con_sqrt2   =1.414214e+0_kind_phys ! square root of 2
   real(kind=kind_phys),parameter:: con_sqrt3   =1.732051e+0_kind_phys ! square root of 3
 !  Primary constants

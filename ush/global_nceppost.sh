@@ -180,7 +180,7 @@
 #
 # Attributes:
 #   Language: POSIX shell
-#   Machine: WCOSS, ZEUS, THEIA, GAEA
+#   Machine: WCOSS, ZEUS, HERA, GAEA
 #
 ####
 ################################################################################
@@ -210,7 +210,7 @@ export NWPROD=${NWPROD:-/nwprod}
 export EXECUTIL=${EXECUTIL:-$NWPROD/util/exec}
 export USHUTIL=${USHUTIL:-$NWPROD/util/ush}
 export EXECGLOBAL=${EXECGLOBAL:-${EXECgfs:-$NWPROD/exec}}
-export USHGLOBAL=${USHGLOBAL:-i${USHgfs:-$NWPROD/ush}}
+export USHGLOBAL=${USHGLOBAL:-${USHgfs:-$NWPROD/ush}}
 export DATA=${DATA:-$(pwd)}
 #  Filenames.
 export MP=${MP:-$([[ $LOADL_STEP_TYPE = PARALLEL ]]&&echo "p"||echo "s")}
@@ -344,7 +344,7 @@ elif [ $OUTTYP -eq 4 ] ; then   #run post to read nemsio file if OUTTYP=4
  export GFSOUT=$NEMSINP
 fi
 #
-if [ $machine = THEIA ] ; then
+if [ $machine = HERA ] ; then
  export MPICH_FAST_MEMCPY=${MPICH_FAST_MEMCPY:-"ENABLE"}
  export MPI_BUFS_PER_PROC=${MPI_BUFS_PER_PROC:-2048}
  export MPI_BUFS_PER_HOST=${MPI_BUFS_PER_HOST:-2048}
@@ -355,7 +355,8 @@ if [ $machine = THEIA ] ; then
 #export MPI_STATS_FILE=${MPI_STATS_FILE:-$(pwd)/mpi_stats.$PBS_JOBID}
 #export MPI_MEMMAP_OFF=${MPI_MEMMAP_OFF:-1}
  export OMP_NUM_THREADS=${OMP_NUM_THREADSP:-${OMP_NUM_THREADS:-8}}
- export APRUN=${APRUNP:-${APRUN_NP:-mpirun}}
+ export APRUN=${APRUNP:-${APRUN_NP:-srun}}
+
 elif [ $machine = WCOSS ] ; then
  export MP_EUIDEVICE=${MP_EUIDEVICE:-min}
  export KMP_STACKSIZE=${KMP_STACKSIZE:-1024000}
@@ -366,6 +367,7 @@ elif [ $machine = WCOSS ] ; then
 #export FORT_BUFFERED=${FORT_BUFFERED:-true}
  export OMP_NUM_THREADS=${OMP_NUM_THREADSP:-${OMP_NUM_THREADS:-8}}
  export APRUN=${APRUNP:-${APRUN_NP:-mpirun.lsf}}
+
 elif [ $machine = WCOSS_C ] ; then
  . $MODULESHOME/init/sh 2>/dev/null
  module unload alps  ; module load alps  2>/dev/null
@@ -377,19 +379,22 @@ elif [ $machine = WCOSS_C ] ; then
 #module load iobuf
 #export IOBUF_PARAMS=${IOBUF_PARAMS:-'*:size=8M:verbose'}
 #export IOBUF_PARAMS=${IOBUF_PARAMS:-'*:size=8M:%stdout:size=2M:verbose'}
+
 elif [ $machine = WCOSS_D ] ; then
- . ${MODULESHOME:-/usrx/local/prod/lmod/lmod}/init/sh         2>> /dev/null
- module purge                                                 2>> /dev/null
- module load EnvVars/1.0.2                                    2>> /dev/null
- module load lsf/10.1                                         2>> /dev/null
- module load ips/18.0.1.163                                   2>> /dev/null
- module load impi/18.0.1                                      2>> /dev/null
- module load HDF5-serial/1.10.1                               2>> /dev/null
- module load NetCDF/4.5.0                                     2>> /dev/null
-#module load HDF5-parallel/1.10.1
-#module load PNetCDF/1.8.1
- module load nemsio/2.2.3                                     2>> /dev/null
- module load prod_envir/1.0.2 prod_util/1.1.0 grib_util/1.0.6 2>> /dev/null
+  if [ ${RELOAD_MODULES:-NO} = YES ] ; then
+   . ${MODULESHOME:-/usrx/local/prod/lmod/lmod}/init/sh         2>> /dev/null
+   module purge                                                 2>> /dev/null
+   module load EnvVars/1.0.2                                    2>> /dev/null
+   module load lsf/10.1                                         2>> /dev/null
+   module load ips/18.0.1.163                                   2>> /dev/null
+   module load impi/18.0.1                                      2>> /dev/null
+   module load HDF5-serial/1.10.1                               2>> /dev/null
+   module load NetCDF/4.5.0                                     2>> /dev/null
+#  module load HDF5-parallel/1.10.1
+#  module load PNetCDF/1.8.1
+   module load nemsio/2.2.3                                     2>> /dev/null
+   module load prod_envir/1.0.2 prod_util/1.1.0 grib_util/1.0.6 2>> /dev/null
+ fi
  export KMP_STACKSIZE=${KMP_STACKSIZE:-1024000}
  export OMP_NUM_THREADS=${OMP_NUM_THREADSP:-${OMP_NUM_THREADS:-8}}
  export OMP_NUM_THREADS_ANOM=${OMP_NUM_THREA_ANOM:-8}
@@ -398,6 +403,7 @@ elif [ $machine = WCOSS_D ] ; then
 #module load iobuf
 #export IOBUF_PARAMS=${IOBUF_PARAMS:-'*:size=8M:verbose'}
 #export IOBUF_PARAMS=${IOBUF_PARAMS:-'*:size=8M:%stdout:size=2M:verbose'}
+
 elif [ $machine = GAEA ] ; then
  export KMP_STACKSIZE=${KMP_STACKSIZE:-1024000}
  export OMP_NUM_THREADS=${OMP_NUM_THREADSP:-${OMP_NUM_THREADS:-8}}
@@ -427,7 +433,7 @@ cd $DATA||exit 99
 
 if [ $IDRT -eq 4 ] ; then
   export LONSPERLAT=${LONSPERLAT:-${fixdir:-$NWPROD/fix/fix_am}/global_lonsperlat.t$JCAP.$LONB.$LATB.txt}
-  cp $LONSPERLAT ./lonsperlat.dat
+# cp $LONSPERLAT ./lonsperlat.dat
 fi
 
 ################################################################################
@@ -508,7 +514,7 @@ ln -sf griddef.out fort.110
 if [ $IDRT -eq 4 ] ; then
   ln -sf $LONSPERLAT lonsperlat.dat
 else
-  ln -sf /dev/null lonsperlat.dat
+  ln -sf /dev/null   lonsperlat.dat
 fi
 MICRO_PHYS_DATA=${MICRO_PHYS_DATA:-$NWPROD/$PARMSUBDA/nam_micro_lookup.dat}
 cp $MICRO_PHYS_DATA ./eta_micro_lookup.dat
@@ -527,90 +533,91 @@ export err=$ERR
 $ERRSCRIPT||exit 2
 
 
+ if [ $FILTER = "1" ] ; then
+
 # Filter SLP and 500 mb height using copygb, change GRIB ID, and then
 # cat the filtered fields to the pressure GRIB file, from Iredell
 
-<<<<<<< HEAD
-if [ $FILTER = "1" ] ; then
-=======
-if [ $GRIBVERSION = grib1 ]; then
-  $COPYGB -x -i'4,0,80' -k'4*-1,1,102' $PGBOUT tfile
-  ln -s -f tfile fort.11
-  ln -s -f prmsl fort.51
-  echo 0 2|$OVERPARMEXEC
-  $COPYGB -x -i'4,1,5' -k'4*-1,7,100,500' $PGBOUT tfile
-  ln -s -f tfile fort.11
-  ln -s -f h5wav fort.51
-  echo 0 222|$OVERPARMEXEC
-
-#cat $PGBOUT prmsl h5wav >> $PGBOUT
-  cat  prmsl h5wav >> $PGBOUT
-
-elif [ $GRIBVERSION = grib2 ]; then
-  if [ ${ens} = YES ] ; then
-    $COPYGB2 -x -i'4,0,80' -k'1 3 0 7*-9999 101 0 0' $PGBOUT tfile
-  else
-    $COPYGB2 -x -i'4,0,80' -k'0 3 0 7*-9999 101 0 0' $PGBOUT tfile
-  fi
-  $WGRIB2 tfile -set_byte 4 11 1 -grib prmsl
-  if [ ${ens} = YES ] ; then
-    $COPYGB2 -x -i'4,1,5' -k'1 3 5 7*-9999 100 0 50000' $PGBOUT tfile
-  else
-    $COPYGB2 -x -i'4,1,5' -k'0 3 5 7*-9999 100 0 50000' $PGBOUT tfile
-  fi
-  $WGRIB2 tfile -set_byte 4 11 193 -grib h5wav
-
-#cat $PGBOUT prmsl h5wav >> $PGBOUT
-
-  cat  prmsl h5wav >> $PGBOUT
-
-fi
->>>>>>> develop
-
   if [ $GRIBVERSION = grib1 ] ; then
-    copygb=${COPYGB:-$EXECUTIL/copygb}
-
-#   $copygb -x -i'4,0,80' -k'4*-1,1,102' $PGBOUT tfile
-    ${precpgb}$copygb -x -i'4,0,80' -k'4*-1,1,102' $PGBOUT tfile
+    $COPYGB -x -i'4,0,80' -k'4*-1,1,102' $PGBOUT tfile
     ln -s -f tfile fort.11
     ln -s -f prmsl fort.51
     echo 0 2|$OVERPARMEXEC
-
-#   $copygb -x -i'4,1,5' -k'4*-1,7,100,500' $PGBOUT tfile
-    ${precpgb}$copygb -x -i'4,1,5' -k'4*-1,7,100,500' $PGBOUT tfile
+    $COPYGB -x -i'4,1,5' -k'4*-1,7,100,500' $PGBOUT tfile
     ln -s -f tfile fort.11
     ln -s -f h5wav fort.51
     echo 0 222|$OVERPARMEXEC
 
-#   cat $PGBOUT prmsl h5wav >> $PGBOUT
+#cat $PGBOUT prmsl h5wav >> $PGBOUT
     cat  prmsl h5wav >> $PGBOUT
 
   elif [ $GRIBVERSION = grib2 ] ; then
-
-    copygb2=${COPYGB2:-$EXECUTIL/copygb2}
-    wgrib2=${WGRIB2:-$EXECUTIL/wgrib2}
-
-    if [ ${ens:-NO} = YES ] ; then
-      ${precpgb}$copygb2 -x -i'4,0,80' -k'1 3 0 7*-9999 101 0 0' $PGBOUT tfile
+    if [ ${ens} = YES ] ; then
+      $COPYGB2 -x -i'4,0,80' -k'1 3 0 7*-9999 101 0 0' $PGBOUT tfile
     else
-      ${precpgb}$copygb2 -x -i'4,0,80' -k'0 3 0 7*-9999 101 0 0' $PGBOUT tfile
+      $COPYGB2 -x -i'4,0,80' -k'0 3 0 7*-9999 101 0 0' $PGBOUT tfile
     fi
-    export err=$?; err_chk
-    ${precpgb}$wgrib2 tfile -set_byte 4 11 1 -grib prmsl
-    export err=$?; err_chk
-
-    if [ ${ens:-NO} = YES ] ; then
-      ${precpgb}$copygb2 -x -i'4,1,5' -k'1 3 5 7*-9999 100 0 50000' $PGBOUT tfile
+    $WGRIB2 tfile -set_byte 4 11 1 -grib prmsl
+    if [ ${ens} = YES ] ; then
+      $COPYGB2 -x -i'4,1,5' -k'1 3 5 7*-9999 100 0 50000' $PGBOUT tfile
     else
-      ${precpgb}$copygb2 -x -i'4,1,5' -k'0 3 5 7*-9999 100 0 50000' $PGBOUT tfile
+      $COPYGB2 -x -i'4,1,5' -k'0 3 5 7*-9999 100 0 50000' $PGBOUT tfile
     fi
-    export err=$?; err_chk
-    ${precpgb}$wgrib2 tfile -set_byte 4 11 193 -grib h5wav
-    export err=$?; err_chk
+    $WGRIB2 tfile -set_byte 4 11 193 -grib h5wav
 
 #  cat $PGBOUT prmsl h5wav >> $PGBOUT
+
     cat  prmsl h5wav >> $PGBOUT
+
   fi
+
+###############################################################################
+# if [ $GRIBVERSION = grib1 ] ; then
+#   copygb=${COPYGB:-$EXECUTIL/copygb}
+
+##  $copygb -x -i'4,0,80' -k'4*-1,1,102' $PGBOUT tfile
+#   ${precpgb}$copygb -x -i'4,0,80' -k'4*-1,1,102' $PGBOUT tfile
+#   ln -s -f tfile fort.11
+#   ln -s -f prmsl fort.51
+#   echo 0 2|$OVERPARMEXEC
+
+##  $copygb -x -i'4,1,5' -k'4*-1,7,100,500' $PGBOUT tfile
+#   ${precpgb}$copygb -x -i'4,1,5' -k'4*-1,7,100,500' $PGBOUT tfile
+#   ln -s -f tfile fort.11
+#   ln -s -f h5wav fort.51
+#   echo 0 222|$OVERPARMEXEC
+
+##  cat $PGBOUT prmsl h5wav >> $PGBOUT
+#   cat  prmsl h5wav >> $PGBOUT
+
+# elif [ $GRIBVERSION = grib2 ] ; then
+
+#   copygb2=${COPYGB2:-$EXECUTIL/copygb2}
+#   wgrib2=${WGRIB2:-$EXECUTIL/wgrib2}
+
+#   if [ ${ens:-NO} = YES ] ; then
+#     ${precpgb}$copygb2 -x -i'4,0,80' -k'1 3 0 7*-9999 101 0 0' $PGBOUT tfile
+#   else
+#     ${precpgb}$copygb2 -x -i'4,0,80' -k'0 3 0 7*-9999 101 0 0' $PGBOUT tfile
+#   fi
+#   export err=$?; err_chk
+#   ${precpgb}$wgrib2 tfile -set_byte 4 11 1 -grib prmsl
+#   export err=$?; err_chk
+
+#   if [ ${ens:-NO} = YES ] ; then
+#     ${precpgb}$copygb2 -x -i'4,1,5' -k'1 3 5 7*-9999 100 0 50000' $PGBOUT tfile
+#   else
+#     ${precpgb}$copygb2 -x -i'4,1,5' -k'0 3 5 7*-9999 100 0 50000' $PGBOUT tfile
+#   fi
+#   export err=$?; err_chk
+#   ${precpgb}$wgrib2 tfile -set_byte 4 11 193 -grib h5wav
+#   export err=$?; err_chk
+
+## cat $PGBOUT prmsl h5wav >> $PGBOUT
+#   cat  prmsl h5wav >> $PGBOUT
+# fi
+###############################################################################
+
 fi
 
 ################################################################################

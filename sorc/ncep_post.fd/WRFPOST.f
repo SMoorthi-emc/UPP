@@ -203,6 +203,7 @@
 !
       print*,'ME,NUM_PROCS,NUM_SERVERS=',ME,NUM_PROCS,NUM_SERVERS
 
+      btim = 0.0
       if (me == 0) CALL W3TAGB('nems     ',0000,0000,0000,'np23   ')
 
       if ( me >= num_procs ) then

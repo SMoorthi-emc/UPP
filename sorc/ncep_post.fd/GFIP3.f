@@ -64,7 +64,7 @@ contains
     call calc_totalWaterPath(hgt, pres, t, totalWater, nz, twp)
 
 
-    pc = getPrecipCond(totalCond, nz, topoK)
+    pc = getPrecipCond(nz, topoK, totalCond)
 
     ! indice for convective icing severity
     call calc_indice(t, td, pres, wvm, nz, topoK, kx, lx, tott)
@@ -210,10 +210,10 @@ contains
 
 !-----------------------------------------------------------------------+
 ! Precipitation Condensate in g/kg
-  real function getPrecipCond(totalCond, nz, topoK)
+  real function getPrecipCond(nz, topoK, totalCond)
     IMPLICIT NONE
-    real, intent(in) :: totalCond(nz)
     integer, intent(in) :: nz, topoK
+    real,    intent(in) :: totalCond(nz)
 
     integer :: k
 
@@ -2108,7 +2108,7 @@ subroutine icing_algo(i,j,pres,temp,rh,hgt,omega,wh,&
 
   IMPLICIT NONE
 
-  integer, external :: getTopoK
+! integer, external :: getTopoK
 !---------------------------------------------------------------------
 ! The GFIP algorithm computes the probability of icing within a model
 !    column given the follow input data
@@ -2175,7 +2175,8 @@ subroutine icing_algo(i,j,pres,temp,rh,hgt,omega,wh,&
 !  write(*,'(2x,I3,A,1x,A,3I6,6F8.2)')me,":","iphy,i,j,lat,lon,prec,cprate,cape,cin=",imp_physics,i,j,xlat,xlon,prate,cprate,cape,cin
 !  do k=1,nz
 !     write(*,'(2x,I3,A,1x,I2,12F9.2)')me,":",k,pres(k),temp(k),rh(k),hgt(k),wh(k),q(k),cwat(k),qqw(k),qqi(k),qqr(k),qqs(k),qqg(k)
-!  end do
+!     write(0,*)me,':',k,pres(k),temp(k),rh(k),hgt(k),wh(k),q(k),cwat(k),qqw(k),qqi(k),qqr(k),qqs(k),qqg(k)
+!  enddo
 
 ! if(mod(i,300)==0 .and. mod(j,200)==0)then
 !    print*,'sample input to FIP ',i,j,nz,xlat,xlon,xalt,prate, cprate
@@ -2184,7 +2185,18 @@ subroutine icing_algo(i,j,pres,temp,rh,hgt,omega,wh,&
 !    end do
 ! end if
 
-  topoK = getTopoK(hgt,xalt,nz)
+! topoK = getTopoK(hgt,xalt,nz)
+
+  if(hgt(nz) >= xalt) then
+    TopoK = nz
+  else
+    do k=nz,2,-1
+      if ((hgt(k-1) > xalt) .and. (hgt(k) <= xalt)) then
+        TopoK = k-1
+        exit
+      endif
+    enddo
+  endif
 
   ! hourly accumulated precipitation
   hprcp  = prate  * 1000. / DTQ2 * 3600.  ! large scale total precipitation in 1 hour
@@ -2270,8 +2282,8 @@ subroutine icing_algo(i,j,pres,temp,rh,hgt,omega,wh,&
 
 
   call icing_sev(imp_physics, hgt, rh, temp, pres, vv, liqCond, iceCond, twp, &
-       ice_pot, nz, hcprcp, cape, lx, kx, tott, pc, prcpType, clouds, &
-       ice_sev)
+       ice_pot, nz, hcprcp, cape, lx, kx, tott, pc, prcpType, clouds, ice_sev)
+
 !  if(mod(i,300)==0 .and. mod(j,200)==0)then
 !    print*,'FIP: cin,cape,pc, kx, lx, tott,pcpTyp',cin,cape,pc, kx, lx, tott,prcpType
 !    print *, "FIP i,j,lat,lon=",i,j,xlat,xlon

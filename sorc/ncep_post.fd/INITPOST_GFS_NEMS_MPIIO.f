@@ -50,13 +50,13 @@
 !$$$  
       use vrbls4d, only: dust, SALT, SUSO, SOOT, WASO, PP25, PP10 
       use vrbls3d, only: t, q, uh, vh,wh,pmid,pint,alpint, dpres,zint,zmid,o3,             &
-              qqr, qqs, cwm, qqi, qqw, omga, rhomid, q2, cfr, rlwtt, rswtt, tcucn,         &
+              qqr, qqs,      qqi, qqw, omga, rhomid, q2, cfr, rlwtt, rswtt, tcucn,         &
               tcucns, train, el_pbl, exch_h, vdifftt, vdiffmois, dconvmois, nradtt,        &
               o3vdiff, o3prod, o3tndy, mwpv, qqg, vdiffzacce, zgdrag, cnvctummixing,       &
               vdiffmacce, mgdrag, cnvctvmmixing, ncnvctcfrac, cnvctumflx, cnvctdmflx,      &
               cnvctzgdrag, sconvmois, cnvctmgdrag, cnvctdetmflx, duwt, duem, dusd, dudp,   &
               dusv,ssem,sssd,ssdp,sswt,sssv,bcem,bcsd,bcdp,bcwt,bcsv,ocem,ocsd,ocdp,       &
-              ocwt,ocsv, ref_10cm, qqnw, qqni,  qqnr, qqns, qqng
+              ocwt,ocsv, ref_10cm, qqnw, qqni, qqnr, qqns, qqng
       use vrbls2d, only: f, pd, fis, pblh, ustar, z0, ths, qs, twbs, qwbs, avgcprate,      &
               cprate, avgprec, prec, lspa, sno, si, cldefi, th10, q10, tshltr, pshltr,     &
               tshltr, albase, avgalbedo, avgtcdc, czen, czmean, mxsnal, radot, sigt4,      &
@@ -79,8 +79,8 @@
       use masks, only: lmv, lmh, htm, vtm, gdlat, gdlon, dx, dy, hbm2, sm, sice
 !     use kinds, only: i_llong
 !     use nemsio_module, only: nemsio_gfile, nemsio_getfilehead, nemsio_getheadvar, nemsio_close
-      use physcons_post, only: grav => con_g, fv => con_fvirt, rgas => con_rd,                     &
-                            eps => con_eps, epsm1 => con_epsm1
+      use physcons_post, only: grav => con_g,   fv    => con_fvirt, rgas => con_rd,             &
+                               eps  => con_eps, epsm1 => con_epsm1
       use params_mod, only: erad, dtr, tfrz, h1, d608, rd, p1000, capa
       use lookup_mod, only: thl, plq, ptbl, ttbl, rdq, rdth, rdp, rdthe, pl, qs0, sqs, sthe,    &
                             ttblq, rdpq, rdtheq, stheq, the0q, the0
@@ -262,7 +262,7 @@
 
 ! open flux file early to read imp_physics
       call nemsio_open(ffile,trim(fileNameFlux),'read',mpi_comm_comp &
-       ,iret=status)
+                      ,iret=status)
       if ( Status /= 0 ) then
         print*,'error opening ',fileNameFlux, ' Status = ', Status
       endif
@@ -296,6 +296,7 @@
       allocate(recname(nrec),reclevtyp(nrec),reclev(nrec))
       allocate(glat1d(im*jm),glon1d(im*jm))
       allocate(vcoord4(lm+1,3,2))
+      vcoord4(:,:,:) = -9999.0
 ! get start date
       call nemsio_getfilehead(nfile,iret=iret                           &
           ,idate=idate(1:7),nfhour=nfhour,recname=recname               &
@@ -305,11 +306,10 @@
 !
       if(iret/=0)print*,'error getting idate,nfhour'
 !     modelname_nemsio='FV3GFS'
+      if(trim(modelname_nemsio) == 'FV3GFS') reduce_grid = .False.
+!
       if (me == 0) then
         print *,'latstar1=',glat1d(1),glat1d(im*jm)
-!
-        print*,'modelname = ',modelname_nemsio
-        if(trim(modelname_nemsio) == 'FV3GFS') reduce_grid=.False.
         print*,'modelname = ',modelname_nemsio,' vflip=',vflip
       endif
 
@@ -375,11 +375,12 @@
         enddo
 !      endif
 
+      if (me == 0) write(0,*)' ak5(1)=',ak5(1),'hyb_sigp=',hyb_sigp
 !
 !  Moorthi - added reading from hyb level file
-      if (ak5(1) < 0.0) then
+      if (minval(ak5) < 0.0 .or. minval(bk5) < 0.0) then
         inquire (file='hyblev_file', exist=file_exists)
-        if (me == 0) write(0,*)' file_exists=',file_exists
+        if (me == 0) write(0,*)' hyblev_file_exists=',file_exists
         if ( .not. file_exists ) then
           if (lm == 64) then
 !--Fanglin Yang:  nemsio file created from FV3 does not have vcoord.
@@ -397,6 +398,7 @@
             stop
           endif
         else
+      if (me == 0) write(0,*)' reading file hyblev_file'
           open (nsil,file='hyblev_file',form='formatted',status='old', &
                                         action='read',iostat=iret)
           levsi = 0
@@ -807,6 +809,7 @@
         VarName = 'dpres'
         call getrecn(recname,reclevtyp,reclev,nrec,varname,VcoordName,l,recn)
         if(recn /= 0) then
+          recn_dpres = recn
           fldst = (recn-1)*fldsize
 !$omp parallel do private(i,j,js)
           do j=jsta,jend
@@ -815,8 +818,8 @@
               dpres(i,j,ll) = tmp(i+js)
 !---------------------- comment out for now ---------------------------
 ! compute pint using dpres from bot up
-              pint(i,j,ll) = ak5(l+1) + bk5(l+1)*pint(i,j,lp1)
-              pmid(i,j,ll) = 0.5*(pint(i,j,ll)+ pint(i,j,ll+1))  ! for now - Moorthi
+!             pint(i,j,ll) = ak5(l+1) + bk5(l+1)*pint(i,j,lp1)
+!             pmid(i,j,ll) = 0.5*(pint(i,j,ll)+ pint(i,j,ll+1))  ! for now - Moorthi
 !---------------------- comment out for now ---------------------------
 
 !             pint(i,j,ll) = pint(i,j,ll+1) - dpres(i,j,ll)
@@ -1109,9 +1112,9 @@
           do j=jsta,jend
             js = fldst + (j-jsta)*im
             do i=1,im
-              zint(i,j,ll) = zint(i,j,ll+1) + tmp(i+js)
+              zint(i,j,ll) = zint(i,j,ll+1) + abs(tmp(i+js))
               if(recn_dpres /= -9999) pmid(i,j,ll) = rgas*dpres(i,j,ll)* &
-                      t(i,j,ll)*(q(i,j,ll)*fv+1.0)/grav/tmp(i+js)
+                      t(i,j,ll)*(q(i,j,ll)*fv+1.0)/grav/abs(tmp(i+js))
             enddo
           enddo
           if(debugprint)print*,'sample l ',VarName,' = ',ll, zint(isa,jsa,ll)
@@ -1120,7 +1123,7 @@
             do j=jsta,jend
               js = fldst + (j-jsta)*im
               do i=1,im
-                omga(i,j,ll) = - wh(i,j,ll) * dpres(i,j,ll) / tmp(i+js)
+                omga(i,j,ll) = - wh(i,j,ll) * dpres(i,j,ll) / abs(tmp(i+js))
               enddo
             enddo
             if(debugprint)print*,'sample l omga for FV3',ll, omga(isa,jsa,ll)
@@ -1203,9 +1206,9 @@
 
 ! construct interface pressure from model top (which is zero) and dp from top down PDTOP
 !     pdtop = spval
-!      pt    = 0.
+!     pt    = 0.
+      pt    = ak5(lp1)
 !     pd    = spval           ! GFS does not output PD
-      pt=ak5(lp1)
 
       ii = im/2
       jj = (jsta+jend)/2
@@ -1215,6 +1218,7 @@
 !!!!! COMPUTE Z, GFS integrates Z on mid-layer instead
 !!! use GFS contants to see if height becomes more aggreable to GFS pressure grib file
 
+!     if (me == 0) write(0,*)' recn_dpres=',recn_dpres
       if (recn_dpres == -9999) then
         do l=lm,1,-1
 !$omp parallel do private(i,j)
@@ -1227,7 +1231,7 @@
           enddo
           if (me == 0) print*,'sample pint,pmid' ,ii,jj,l,pint(ii,jj,l),pmid(ii,jj,l)
         enddo
-!     else
+      else
 ! compute pint using dpres from bot up
 !        do l=lm,1,-1
 !          do j=jsta,jend
@@ -1246,6 +1250,7 @@
             pint(i,j,1) = ak5(lp1)
           enddo
         enddo
+        if (me == 0) print*,'sample model top pint' ,ii,jj, pint(ii,jj,1)
 
         do l=2,lp1
           ll = l - 1
@@ -1257,7 +1262,7 @@
             enddo
           enddo
           if (me == 0) print*,'sample model pint,pmid' ,ii,jj,l &
-                             ,pint(ii,jj,l),pmid(ii,jj,l)
+                             ,pint(ii,jj,l),pmid(ii,jj,l-1)
         enddo
 
       endif
@@ -1459,10 +1464,11 @@
       do j=jsta,jend
         do i=1,im
           pd(i,j)     = spval           ! GFS does not output PD
-          pint(i,j,1) = PT
+!         pint(i,j,1) = PT
         enddo
       enddo
 
+!     if (me == 0) write(0,*)' pint=',pint(1,jsta,:)
 !$omp parallel do private(i,j,l)
 !     do l=lp1,2,-1                ????????????????????
       do l=lp1,1,-1
@@ -1473,6 +1479,7 @@
         enddo
       enddo
 
+      if (me == 0) write(0,*)' recn_delz=',recn_delz
       if (recn_delz == -9999) then !only compute H if it's not in model output
         allocate(wrk1(im,jsta:jend),wrk2(im,jsta:jend))
 !$omp parallel do private(i,j)
@@ -1518,6 +1525,9 @@
         ENDDO
         deallocate(wrk1,wrk2)
       else
+!     if (me == 0) write(0,*)' zint=',zint(1,jsta,:)
+!     if (me == 0) write(0,*)' pmid=',pmid(1,jsta,:)
+!     if (me == 0) write(0,*)' alpint=',alpint(1,jsta,:)
         do l=lm,1,-1
           ll = l + 1
 !$omp parallel do private(i,j)
@@ -1667,13 +1677,13 @@
                               ,recname,reclevtyp,reclev,VarName,VcoordName &
                               ,salt(1:im,jsta_2l:jend_2u,ll,3))
 
-!$omp parallel do private(i,j)
-          do j=jsta_2l,jend_2u
-            do i=1,im
-              sscb(i,j) = sscb(i,j) + (salt(i,j,ll,2)+0.75*salt(i,j,ll,3)) &
-                                    * dpres(i,j,ll) *(1.0/grav)
-            enddo
-          enddo
+!!$omp parallel do private(i,j)
+!         do j=jsta_2l,jend_2u
+!           do i=1,im
+!             sscb(i,j) = sscb(i,j) + (salt(i,j,ll,2)+0.75*salt(i,j,ll,3)) &
+!                                   * dpres(i,j,ll) *(1.0/grav)
+!           enddo
+!         enddo
      
 !         if(debugprint)print*,'sample l ',VarName,' = ',ll,salt(isa,jsa,ll,3)
         enddo ! do loop for l
