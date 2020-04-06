@@ -98,6 +98,11 @@ elif [ $machine = wcoss_c ] ; then
   export PROFILE=""
   export OMPFLG="-openmp"
 elif [ $machine = wcoss_d ] ; then
+  . $MODULESHOME/init/sh 2>/dev/null
+  module unload NetCDF
+  module use /gpfs/dell2/emc/modeling/noscrub/emc.nemspara/soft/modulefiles
+  module load hdf5_parallel/1.10.6
+  module load netcdf_parallel/4.7.4
 # module load g2/3.1.0
 # module load xmlparse/2.0.0
 # module load jasper/1.900.29
