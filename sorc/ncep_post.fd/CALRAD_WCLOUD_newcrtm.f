@@ -358,7 +358,7 @@ SUBROUTINE CALRAD_WCLOUD
          czen(i,j) = cos(sun_zenith/rtd)
        enddo
      enddo
-     if(jj>=jsta .and. jj<=jend)                                  &
+     if(jj>=jsta .and. jj<=jend .and. debugprint)                   &
          print*,'sample GFS zenith angle=',acos(czen(ii,jj))*rtd   
 !     end if	       
      ! Initialize CRTM.  Load satellite sensor array.

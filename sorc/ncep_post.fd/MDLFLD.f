@@ -38,8 +38,8 @@
 !   12-01-21  S LU - MODIFIED TO PROCESS NON-DUST AEROSOLS
 !   14-02-27  S MOORTHI - Added threading and some cleanup
 !   14-11-17  B ZHOU - Undetected ECHO TOP value is modified from SPVAL to -5000.
-!   15-xx-xx  S. Moorthi - reduced memory version
-!   15-11-03  S. Moorthi - fix a bug in "RELATIVE HUMIDITY ON MDLSURFACES" sectio logic
+!   15-xx-xx  S Moorthi - reduced memory version
+!   15-11-03  S Moorthi - fix a bug in "RELATIVE HUMIDITY ON MDLSURFACES" sectio logic
 !
 ! USAGE:    CALL MDLFLD
 !   INPUT ARGUMENT LIST:

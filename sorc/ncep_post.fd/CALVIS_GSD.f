@@ -94,7 +94,6 @@
       use vrbls3d,    only: qqw, qqi, qqs, qqr, qqg, t, pmid, q, u, v, extcof55, aextc55
       use params_mod, only: h1, d608, rd
       use ctlblk_mod, only: jm, im, jsta_2l, jend_2u, lm, modelname
-      use ctlblk_mod, only: jm, im, jsta_2l, jend_2u, jsta, jend, lm, modelname
 
       implicit none
 
@@ -203,7 +202,7 @@
       vis_min = 1.e6
       visrh_min = 1.e6
  
-      DO J=jsta,jend
+      DO J=jsta_2l,jend_2u
         DO I=1,IM
 !  - take max hydrometeor mixing ratios in lowest 3 levels (lowest 13 hPa, 100m with RAP/HRRR
           qrain = 0.
