@@ -240,8 +240,8 @@
 
         DO LP=1,LSM
 
-          if(me == 0) print *,'in LP loop me=',me,'UH=',UH(1:10,JSTA,LP), &
-                              'SPL(LP)=',SPL(LP)
+!         if(me == 0) print *,'in LP loop me=',me,'UH=',UH(1:10,JSTA,LP), &
+!                             'SPL(LP)=',SPL(LP)
 
 !         if(me ==0) print *,'in mdl2p,LP loop o3=',maxval(o3(1:im,jsta:jend,lm))
 !

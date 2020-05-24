@@ -66,8 +66,8 @@
       subroutine calwxt_bourg_post(im,jm,jsta_2l,jend_2u,jsta,jend,lm,lp1,   &
      &                             iseed,g,pthresh,                          &
      &                             t,q,pmid,pint,lmh,prec,zint,ptype,me)
-!     use mersenne_twister, only: random_number
-      use mersenne_twister
+      use mersenne_twister, only: random_number, random_setseed
+!     use mersenne_twister
       implicit none
 !
 !    input:
@@ -109,7 +109,7 @@
       print *,'incalwxtbg, rn',maxval(rn),minval(rn)
 
       do j=jsta,jend
-      if(me==1)print *,'incalwxtbg, j=',j
+!     if(me==1)print *,'incalwxtbg, j=',j
         do i=1,im
            lmhk  = min(nint(lmh(i,j)),lm)
            psfck = pint(i,j,lmhk+1)

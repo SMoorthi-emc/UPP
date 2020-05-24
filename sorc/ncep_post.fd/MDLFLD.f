@@ -553,7 +553,7 @@ refl_adj:                 IF(REF_10CM(I,J,L) <= DBZmin) THEN
         ELSE
           IICE = 1
         END IF
-        PRINT*,'IICE= ',IICE
+!       PRINT*,'IICE= ',IICE
 
 ! Chuang: add convective contribution for all MP schemes
         RDTPHS=3.6E6/DTQ2

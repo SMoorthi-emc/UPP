@@ -161,7 +161,7 @@
         imb2  = im /2
         eradi = 1.0 / erad
 
-!!        IF(MODELNAME == 'GFS' .or. global) THEN
+!!      IF(MODELNAME == 'GFS' .or. global) THEN
         IF(GRIDTYPE == 'A')THEN
 !$omp parallel do private(i)
           do i=1,im
@@ -344,15 +344,15 @@
               END IF
   
 
-              IF(I==IM/2 .AND. J==JM/2)then 
-                PRINT*,'SAMPLE PVETC INPUT ',                                 &
-                       'p,dpdx,dpdy,tv,dtdx,dtdy,h,u,v,vort= '
-                DO L=1,LM
-                  print*,pmid(i,j,l),dum1d1(l),dum1d2(l),dum1d5(l)      &
-                        ,dum1d3(l),dum1d4(l),zmid(i,j,l),uh(i,j,l),vh(i,j,l)  &
-                        ,dum1d6(l)
-                end do
-              end if
+!             IF(I==IM/2 .AND. J==JM/2)then 
+!               PRINT*,'SAMPLE PVETC INPUT ',                                 &
+!                      'p,dpdx,dpdy,tv,dtdx,dtdy,h,u,v,vort= '
+!               DO L=1,LM
+!                 print*,pmid(i,j,l),dum1d1(l),dum1d2(l),dum1d5(l)      &
+!                       ,dum1d3(l),dum1d4(l),zmid(i,j,l),uh(i,j,l),vh(i,j,l)  &
+!                       ,dum1d6(l)
+!               enddo
+!             endif
 
               CALL PVETC(LM,PMID(I,J,1:LM),DUM1D1,DUM1D2                      &
                         ,DUM1D5,DUM1D3,DUM1D4,ZMID(I,J,1:LM),UH(I,J,1:LM)     &

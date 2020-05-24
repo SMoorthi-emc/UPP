@@ -317,6 +317,7 @@
                                       itblinfo,                       &
                                       idisc, icatg, iparm, ierr)
           if(ierr == 0) then
+            if (debugprint)                                           &
             write(6,'(3(A,I4),A,A)') '  discipline ',idisc,           &
                                      '  category ',icatg,             &
                                      '  parameter ',iparm,            &
@@ -408,6 +409,7 @@
                                     itblinfo,                      &
                                     idisc, icatg, iparm, ierr)
        if(ierr == 0) then
+         if (debugprint)                                           &
          write(0,'(3(A,I4),A,A)') '  discipline ',idisc,           &
                                   '  category ',icatg,             &
                                   '  parameter ',iparm,            &
@@ -528,11 +530,11 @@
     integer mxbit
     integer listsec0(2)              ! Length of section 0 octets 7 & 8
     integer listsec1(13)             ! Length of section 1 from octets 6-21
-    integer ipdstmpllen                   ! Length of general Section 4 PDS Template
-    integer ipdstmpl(ipdstmplenmax)       ! Length of Section 4 PDS Template 4.48
+    integer ipdstmpllen              ! Length of general Section 4 PDS Template
+    integer ipdstmpl(ipdstmplenmax)  ! Length of Section 4 PDS Template 4.48
     integer idrstmplen
-    integer idrstmpl(idrstmplenmax)       ! Length of Section 5 PDS Template 5.40
-    integer igds(5)                       ! Length of section 3 GDS Octet 6-14
+    integer idrstmpl(idrstmplenmax)  ! Length of Section 5 PDS Template 5.40
+    integer igds(5)                  ! Length of section 3 GDS Octet 6-14
     integer igdstmplen
     integer igdtlen,igdtn
     integer idefnum
@@ -938,13 +940,13 @@
             trim(pset%param(nprm)%shortname)=='VVCSH_ON_SPEC_HGT_LVL_ABOVE_GRND_0-1km'.or.&
             trim(pset%param(nprm)%shortname)=='VUCSH_ON_SPEC_HGT_LVL_ABOVE_GRND_0-6km'.or.&
             trim(pset%param(nprm)%shortname)=='VVCSH_ON_SPEC_HGT_LVL_ABOVE_GRND_0-6km')then
-            idrsnum=0
+            idrsnum = 0
 !            print*,' changing to simple packing for field: ',trim(pset%param(nprm)%shortname)
          endif
        endif
 
-       print *,'aft g2sec5,packingmethod=',pset%packing_method,'idrsnum=',idrsnum, &
-          'data=',maxval(datafld1),minval(datafld1)
+!      print *,'aft g2sec5,packingmethod=',pset%packing_method,'idrsnum=',idrsnum, &
+!         'data=',maxval(datafld1),minval(datafld1)
 !
 !*** set number of bits, and binary scale
 !
@@ -973,17 +975,19 @@
        if(MXBIT > 16) write(0,*)'increased MXBIT for ', pset%param(nprm)%pname,MXBIT,' me=',me
 !
        call g2getbits(mxbit,ibmap,fldscl,size(datafld1),bmap,datafld1,ibin_scl,idec_scl,inumbits)
-        print *,'idec_scl=',idec_scl,'ibin_scl=',ibin_scl,'number_bits=',inumbits
-       if( idrsnum==40 ) then
+
+!       print *,'idec_scl=',idec_scl,'ibin_scl=',ibin_scl,'number_bits=',inumbits
+
+       if( idrsnum == 40 ) then
          idrstmplen=idrstmp5_40len
          call g2sec5_temp40(idec_scl,ibin_scl,inumbits,pset%comprs_type,idrstmpl(1:idrstmplen))
-       elseif( idrsnum==2 ) then
+       elseif( idrsnum == 2 ) then
          idrstmplen=idrstmp5_2len
          call g2sec5_temp2(idec_scl,ibin_scl,idrstmpl(1:idrstmplen))
-       elseif( idrsnum==3 ) then
+       elseif( idrsnum == 3 ) then
          idrstmplen=idrstmp5_3len
          call g2sec5_temp3(idec_scl,ibin_scl,pset%order_of_sptdiff,idrstmpl(1:idrstmplen))
-       elseif( idrsnum==0 ) then
+       elseif( idrsnum == 0 ) then
          idrstmplen=idrstmp5_0len
          call g2sec5_temp0(idec_scl,ibin_scl,inumbits,idrstmpl(1:idrstmplen))
        endif
