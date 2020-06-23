@@ -5973,7 +5973,7 @@
           datapd(1:im,1:jend-jsta+1,cfld)=GRID1(1:im,jsta:jend)
         endif
       ENDIF
-      if (me==0)print*,'starting computing canopy conductance'
+!     if (me==0)print*,'starting computing canopy conductance'
 !
 ! CANOPY CONDUCTANCE
 ! ONLY OUTPUT NEW LSM FIELDS FOR NMM AND ARW BECAUSE RSM USES OLD SOIL TYPES
@@ -5985,7 +5985,7 @@
      & .OR. IGET(239).GT.0 .OR. IGET(240).GT.0             &
      & .OR. IGET(241).GT.0 .OR. IGET(254).GT.0 ) THEN
         IF (iSF_SURFACE_PHYSICS .EQ. 2) THEN    !NSOIL == 4
-          if(me==0)print*,'starting computing canopy conductance'
+!         if(me==0)print*,'starting computing canopy conductance'
          allocate(rsmin(im,jsta:jend), smcref(im,jsta:jend), gc(im,jsta:jend), &
                   rcq(im,jsta:jend), rct(im,jsta:jend), rcsoil(im,jsta:jend), rcs(im,jsta:jend))
          DO J=JSTA,JEND
