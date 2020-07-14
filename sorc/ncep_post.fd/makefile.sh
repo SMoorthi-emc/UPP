@@ -4,7 +4,7 @@ mac=$(hostname | cut -c1-1)
 mac2=$(hostname | cut -c1-2)
 ################################# options ###############################################
 #export CLEAN=NO                                 # comment this line to clean before compiling
-#debug=YES                                       # turn on debug mode     - default - NO
+ debug=YES                                       # turn on debug mode     - default - NO
  make_post_lib=YES                               # create post library    - default - NO
  make_post_exec=YES                              # create post executable - default - YES
 #make_nowrf=NO                                   # compile with wrf stub instead of WRF lib
@@ -55,7 +55,7 @@ if [ $machine = wcoss ] ; then
   if [ $debug = YES ] ; then
     export OPTS="-O0 -openmp "
 #   export DEBUG="-g -check all -ftrapuv -convert big_endian -fp-stack-check -fstack-protector -heap-arrays -recursive -traceback"
-    export DEBUG="-g -traceback -convert big_endian -ftrapuv -check bounds -check format -check output_conversion -check pointers -check uninit -fp-stack-check"
+    export DEBUG="-g -traceback -convert big_endian -ftrapuv -check bounds -check format -check output_conversion -check pointers -check uninit -fp-stack-check -link_mpi=dbg"
   else
     export OPTS="-O3 -convert big_endian -fp-model source -openmp -xAVX"
     export DEBUG=""
