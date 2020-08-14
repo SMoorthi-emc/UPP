@@ -2095,9 +2095,7 @@
              ENDDO
              if(grib == 'grib1')then
                ID(1:25) = 0
-!sm            ID(1:46) = 0
                ID(02)   = 141             ! Parameter Table 141
-!sm            ID(36)   = 2
 
                CALL GRIBIT(IGET(738),LP,GRID1,IM,JM)
              elseif(grib == 'grib2') then

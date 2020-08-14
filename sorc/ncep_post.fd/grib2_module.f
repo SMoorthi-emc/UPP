@@ -226,13 +226,11 @@
     real,   allocatable :: datafldtmp(:)
     logical, parameter  :: debugprint = .false.
 !
-    character(1), allocatable :: cgrib(:)
-!   character(1) cgrib(max_bytes)
+    character(1), dimension(:), allocatable :: cgrib
 !
 !
 !---------------- code starts here --------------------------
 !
-!   if (me == 0) write(0,*)' in gribit2 ntlfld=',ntlfld,' max_bytes=',max_bytes
     allocate(cgrib(max_bytes))
 !
 !******* part 1 resitribute data ********
@@ -335,7 +333,8 @@
         enddo
 !
         call baclose(lunout,ierr)
-      endif
+         print *,'finish one grib file'
+      endif ! if(me==0)
 !
 !for more fields, use parallel i/o
     else
