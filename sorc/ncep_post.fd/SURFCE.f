@@ -85,7 +85,7 @@
                          ,fieldcapa,edir,ecan,etrans,esnow,U10mean,V10mean,   &
                          avgedir,avgecan,avgetrans,avgesnow,acgraup,acfrain,  &
                          acond,maxqshltr,minqshltr,avgpotevp,AVGPREC_CONT,    &
-                         AVGCPRATE_CONT,sst
+                         AVGCPRATE_CONT,sst,ch10,cd10
       use soil,    only: stc, sllevel, sldpth, smc, sh2o
       use masks,   only: lmh, sm, sice, htm, gdlat, gdlon
       use physcons_post,only: CON_EPS, CON_EPSM1
@@ -99,6 +99,8 @@
                             lp1, imp_physics, me, asrfc, tsrfc, pt, pdtop,   &
                             mpi_comm_comp, im, jm
       use rqstfld_mod, only: iget, lvls, id, iavblfld, lvlsxml
+
+      use mersenne_twister, only: random_number, random_setseed
 !- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
        implicit none
 !
@@ -148,6 +150,9 @@
            qv,e,dwpt,dum1,dum2,dum3,dum1s,dum3s,dum21,dum216,es
 
       real,external :: fpvsnew
+
+      real (kind=8) :: wrk(1)
+      integer       :: iseed0
 
 !****************************************************************************
 !
@@ -4362,10 +4367,16 @@
                ENDDO
              ENDDO
 
+             write(0,*)'in SURFCE,me=',me,'sdat=',sdat,' ihrst=',ihrst,' ifhr=',ifhr,' ifmin=',ifmin
 ! BOURGOUIN ALGORITHM
-             ISEED=44641*(INT(SDAT(1)-1)*24*31+INT(SDAT(2))*24+IHRST)+   &
-     &             MOD(IFHR*60+IFMIN,44641)+4357
-!            write(0,*)'in SURFCE,me=',me,'bef 1st CALWXT_BOURG_POST iseed=',iseed
+!            ISEED=44641*(INT(SDAT(1)-1)*24*31+INT(SDAT(2))*24+IHRST)+   &
+!    &             MOD(IFHR*60+IFMIN,44641)+4357
+
+             iseed0 = sdat(1) + sdat(2) + sdat(3) + ihrst
+             call random_setseed(iseed0)
+             call random_number(wrk)
+             iseed = iseed0 + nint(wrk(1)*1000.0d0) + ifhr + ifmin
+             
              CALL CALWXT_BOURG_POST(IM,JM,JSTA_2L,JEND_2U,JSTA,JEND,LM,LP1,&
      &                              ISEED,G,PTHRESH,                       &
      &                              T,Q,PMID,PINT,LMH,PREC,ZINT,IWX1,me)
@@ -4577,11 +4588,16 @@
            ENDDO
 
 ! BOURGOUIN ALGORITHM
-           ISEED=44641*(INT(SDAT(1)-1)*24*31+INT(SDAT(2))*24+IHRST)+   &
-     &           MOD(IFHR*60+IFMIN,44641)+4357
-!          write(0,*)'in SURFCE,me=',me,'bef sec CALWXT_BOURG_POST'
+!          ISEED=44641*(INT(SDAT(1)-1)*24*31+INT(SDAT(2))*24+IHRST)+   &
+!    &           MOD(IFHR*60+IFMIN,44641)+4357
+
+             iseed0 = sdat(1) + sdat(2) + sdat(3) + ihrst
+             call random_setseed(iseed0)
+             call random_number(wrk)
+             iseed = iseed0 + nint(wrk(1)*1000.0d0) + ifhr + ifmin
+
            CALL CALWXT_BOURG_POST(IM,JM,JSTA_2L,JEND_2U,JSTA,JEND,LM,LP1,&
-     &                        ISEED,G,PTHRESH,                            &
+     &                        ISEED,G,PTHRESH,                           &
      &                        T,Q,PMID,PINT,LMH,AVGPREC,ZINT,IWX1,me)
 !          write(0,*)'in SURFCE,me=',me,'aft sec CALWXT_BOURG_POST'
 !          print *,'in SURFCE,me=',me,'IWX1=',IWX1(1:30,JSTA)
@@ -5653,6 +5669,41 @@
             datapd(1:im,1:jend-jsta+1,cfld)=GRID1(1:im,jsta:jend)
            endif
       ENDIF
+
+      write_cd: IF(IGET(922)>0) THEN
+         DO J=JSTA,JEND
+            DO I=1,IM
+               GRID1(I,J)=CD10(I,J)
+            ENDDO
+         ENDDO
+         if(grib=='grib1') then
+            ID(1:25) = 0
+            ID(2)=2
+            ID(11)=10
+            CALL GRIBIT(IGET(922),LVLS(1,IGET(922)),GRID1,IM,JM)
+         elseif(grib=='grib2') then
+            cfld=cfld+1
+            fld_info(cfld)%ifld=IAVBLFLD(IGET(922))
+            datapd(1:im,1:jend-jsta+1,cfld)=GRID1(1:im,jsta:jend)
+         endif
+      ENDIF write_cd
+      write_ch: IF(IGET(923)>0) THEN
+         DO J=JSTA,JEND
+            DO I=1,IM
+               GRID1(I,J)=CH10(I,J)
+            ENDDO
+         ENDDO
+         if(grib=='grib1') then
+            ID(1:25) = 0
+            ID(11)=10
+            ID(2)=128
+            CALL GRIBIT(IGET(923),LVLS(1,IGET(923)),GRID1,IM,JM)
+         elseif(grib=='grib2') then
+            cfld=cfld+1
+            fld_info(cfld)%ifld=IAVBLFLD(IGET(923))
+            datapd(1:im,1:jend-jsta+1,cfld)=GRID1(1:im,jsta:jend)
+         endif
+      ENDIF write_ch
 !     
 !     MODEL OUTPUT SURFACE U AND/OR V COMPONENT WIND STRESS
       IF ( (IGET(900).GT.0) .OR. (IGET(901).GT.0) ) THEN

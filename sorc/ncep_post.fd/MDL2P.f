@@ -2094,11 +2094,8 @@
                ENDDO
              ENDDO
              if(grib == 'grib1')then
-               ID(1:25) = 0
-!sm            ID(1:46) = 0
-               ID(02)   = 141             ! Parameter Table 141
-!sm            ID(36)   = 2
-
+               ID(1:25)=0
+               ID(02)=141             ! Parameter Table 141
                CALL GRIBIT(IGET(738),LP,GRID1,IM,JM)
              elseif(grib == 'grib2') then
                cfld = cfld + 1
@@ -3952,10 +3949,10 @@
 ! OUTPUT MEMBRANCE SLP
       IF(IGET(023) > 0)THEN
         IF(gridtype == 'A'.OR. gridtype == 'B') then                  
-          if(me==0)PRINT*,'CALLING MEMSLP for A or B grid'
+          if(me==0) PRINT*,'CALLING MEMSLP for A or B grid'
           CALL MEMSLP(TPRS,QPRS,FPRS)
         ELSE IF (gridtype == 'E')THEN
-          if(me==0)PRINT*,'CALLING MEMSLP_NMM for E grid'
+          if(me==0) PRINT*,'CALLING MEMSLP_NMM for E grid'
           CALL MEMSLP_NMM(TPRS,QPRS,FPRS)
         ELSE
           PRINT*,'unknow grid type-> WONT DERIVE MESINGER SLP'
