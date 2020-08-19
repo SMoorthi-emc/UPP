@@ -83,13 +83,11 @@
 !
       integer i,j,ifrzl,iwrml,l,lhiwrm,lmhk,jlen
       real pintk1,areane,tlmhk,areape,pintk2,surfw,area1,dzkl,psfck,r1,r2
-      real rn(im*jm*2)
+      real (kind=8) :: rn(im*jm*2)
 !
 !     initialize weather type array to zero (ie, off).
 !     we do this since we want ptype to represent the
 !     instantaneous weather type on return.
-      print *,'in calwxtbg, jsta,jend=',jsta,jend,' im=',im
-      print *,'in calwxtbg,me=',me,'iseed=',iseed
 !     
 !$omp  parallel do
       do j=jsta,jend
@@ -102,14 +100,13 @@
       call random_setseed(iseed)
       call random_number(rn)
 !     call random_number(rn,iseed)
+
 !
 !!$omp  parallel do                                                   &
 !     & private(a,lmhk,tlmhk,iwrml,psfck,lhiwrm,pintk1,pintk2,area1,  &
 !     &         areape,dzkl,surfw,r1,r2)
-      print *,'incalwxtbg, rn',maxval(rn),minval(rn)
 
       do j=jsta,jend
-!     if(me==1)print *,'incalwxtbg, j=',j
         do i=1,im
            lmhk  = min(nint(lmh(i,j)),lm)
            psfck = pint(i,j,lmhk+1)
@@ -258,10 +255,7 @@
                end if
              end if
            end if
-!     write(1000+me,*)' finished for i, j,  from calbourge me=',me,i,j
         end do
-!     write(1000+me,*)' finished for  j,  from calbourge me=',me,j
       end do
-!     write(1000+me,*)' returning from calbourge me=',me
       return
       end

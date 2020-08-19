@@ -99,6 +99,8 @@
                             lp1, imp_physics, me, asrfc, tsrfc, pt, pdtop,   &
                             mpi_comm_comp, im, jm
       use rqstfld_mod, only: iget, lvls, id, iavblfld, lvlsxml
+
+      use mersenne_twister, only: random_number, random_setseed
 !- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
        implicit none
 !
@@ -148,6 +150,9 @@
            qv,e,dwpt,dum1,dum2,dum3,dum1s,dum3s,dum21,dum216,es
 
       real,external :: fpvsnew
+
+      real (kind=8) :: wrk(1)
+      integer       :: iseed0
 
 !****************************************************************************
 !
@@ -4362,10 +4367,16 @@
                ENDDO
              ENDDO
 
+             write(0,*)'in SURFCE,me=',me,'sdat=',sdat,' ihrst=',ihrst,' ifhr=',ifhr,' ifmin=',ifmin
 ! BOURGOUIN ALGORITHM
-             ISEED=44641*(INT(SDAT(1)-1)*24*31+INT(SDAT(2))*24+IHRST)+   &
-     &             MOD(IFHR*60+IFMIN,44641)+4357
-!            write(0,*)'in SURFCE,me=',me,'bef 1st CALWXT_BOURG_POST iseed=',iseed
+!            ISEED=44641*(INT(SDAT(1)-1)*24*31+INT(SDAT(2))*24+IHRST)+   &
+!    &             MOD(IFHR*60+IFMIN,44641)+4357
+
+             iseed0 = sdat(1) + sdat(2) + sdat(3) + ihrst
+             call random_setseed(iseed0)
+             call random_number(wrk)
+             iseed = iseed0 + nint(wrk(1)*1000.0d0) + ifhr + ifmin
+             
              CALL CALWXT_BOURG_POST(IM,JM,JSTA_2L,JEND_2U,JSTA,JEND,LM,LP1,&
      &                              ISEED,G,PTHRESH,                       &
      &                              T,Q,PMID,PINT,LMH,PREC,ZINT,IWX1,me)
@@ -4577,11 +4588,16 @@
            ENDDO
 
 ! BOURGOUIN ALGORITHM
-           ISEED=44641*(INT(SDAT(1)-1)*24*31+INT(SDAT(2))*24+IHRST)+   &
-     &           MOD(IFHR*60+IFMIN,44641)+4357
-!          write(0,*)'in SURFCE,me=',me,'bef sec CALWXT_BOURG_POST'
+!          ISEED=44641*(INT(SDAT(1)-1)*24*31+INT(SDAT(2))*24+IHRST)+   &
+!    &           MOD(IFHR*60+IFMIN,44641)+4357
+
+             iseed0 = sdat(1) + sdat(2) + sdat(3) + ihrst
+             call random_setseed(iseed0)
+             call random_number(wrk)
+             iseed = iseed0 + nint(wrk(1)*1000.0d0) + ifhr + ifmin
+
            CALL CALWXT_BOURG_POST(IM,JM,JSTA_2L,JEND_2U,JSTA,JEND,LM,LP1,&
-     &                        ISEED,G,PTHRESH,                            &
+     &                        ISEED,G,PTHRESH,                           &
      &                        T,Q,PMID,PINT,LMH,AVGPREC,ZINT,IWX1,me)
 !          write(0,*)'in SURFCE,me=',me,'aft sec CALWXT_BOURG_POST'
 !          print *,'in SURFCE,me=',me,'IWX1=',IWX1(1:30,JSTA)
@@ -6008,7 +6024,7 @@
           datapd(1:im,1:jend-jsta+1,cfld)=GRID1(1:im,jsta:jend)
         endif
       ENDIF
-      if (me==0)print*,'starting computing canopy conductance'
+!     if (me==0)print*,'starting computing canopy conductance'
 !
 ! CANOPY CONDUCTANCE
 ! ONLY OUTPUT NEW LSM FIELDS FOR NMM AND ARW BECAUSE RSM USES OLD SOIL TYPES
@@ -6020,7 +6036,7 @@
      & .OR. IGET(239).GT.0 .OR. IGET(240).GT.0             &
      & .OR. IGET(241).GT.0 .OR. IGET(254).GT.0 ) THEN
         IF (iSF_SURFACE_PHYSICS .EQ. 2) THEN    !NSOIL == 4
-          if(me==0)print*,'starting computing canopy conductance'
+!         if(me==0)print*,'starting computing canopy conductance'
          allocate(rsmin(im,jsta:jend), smcref(im,jsta:jend), gc(im,jsta:jend), &
                   rcq(im,jsta:jend), rct(im,jsta:jend), rcsoil(im,jsta:jend), rcs(im,jsta:jend))
          DO J=JSTA,JEND
