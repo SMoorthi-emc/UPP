@@ -108,7 +108,7 @@
                          ALWINC, ALWTOAC, SWDDNI, SWDDIF, SWDNBC, SWDDNIC,    &
                          SWDDIFC, SWUPBC, LWDNBC, LWUPBC, SWUPT,              &
                          TAOD5502D, AERSSA2D, AERASY2D, MEAN_FRP, LWP, IWP,   &
-                         AERASY2D, AVGCPRATE,                                 &
+                         TAOD5502D, AERSSA2D, AERASY2D, AVGCPRATE,            &
                          DUSTCB,SSCB,BCCB,OCCB,SULFCB,DUSTPM,SSPM
       use masks,    only: LMH, HTM
       use params_mod, only: TFRZ, D00, H99999, QCLDMIN, SMALL, D608, H1, ROG, &

@@ -522,7 +522,7 @@
 
 
          ! Relabel the pressure level to reference levels
-         IDS = 0
+!         IDS = 0
          IDS = (/ 450,480,464,465,466,518,519,520,521,522,523,524,525,(0,I=14,50) /)
          do i = 1, NFDMAX
             iID=IDS(i)

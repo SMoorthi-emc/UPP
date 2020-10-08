@@ -2,3 +2,6 @@
 
 "perl PostXMLPreprocessor.pl postcntrl_gfs_tke_mg2.xml post_avblflds.xml postcntrl_gfs_tke_mg2.txt"
 
+"perl PostXMLPreprocessor.pl postcntrl_gfs_tke_mg3_57l_00_two.xml post_avblflds.xml postcntrl_gfs_tke_mg3_57l_00_two.txt >&xxx00&"
+"perl PostXMLPreprocessor.pl postcntrl_gfs_tke_mg3_57l_two.xml post_avblflds.xml postcntrl_gfs_tke_mg3_57l_two.txt >&xxx&"
+
