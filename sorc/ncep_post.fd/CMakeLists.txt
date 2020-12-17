@@ -67,7 +67,6 @@ list(APPEND LIB_SRC
     GFSPOST.F
     GPVS.f
     grib2_module.f
-    GRIBIT.F
     GRIDAVG.f
     GRIDSPEC.f
     gtg_algo.f90
@@ -190,8 +189,8 @@ elseif(CMAKE_Fortran_COMPILER_ID MATCHES "^(GNU|Clang|AppleClang)$")
   endif()
 endif()
 
-set(LIBNAME "nceppost")
-set(EXENAME "nceppost.x")
+set(LIBNAME "upp")
+set(EXENAME "ncep_post")
 
 set(module_dir "${CMAKE_CURRENT_BINARY_DIR}/include")
 

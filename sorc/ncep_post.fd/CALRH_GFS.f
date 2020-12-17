@@ -1,51 +1,51 @@
-      SUBROUTINE CALRH_GFS(P1,T1,Q1,RH)
-!$$$  SUBPROGRAM DOCUMENTATION BLOCK
-!                .      .    .     
-! SUBPROGRAM:    CALRH       COMPUTES RELATIVE HUMIDITY
-!   PRGRMMR: TREADON         ORG: W/NP2      DATE: 92-12-22       
-!     
-! ABSTRACT:  
-!     THIS ROUTINE COMPUTES RELATIVE HUMIDITY GIVEN PRESSURE, 
-!     TEMPERATURE, SPECIFIC HUMIDITY. AN UPPER AND LOWER BOUND
-!     OF 100 AND 1 PERCENT RELATIVE HUMIDITY IS ENFORCED.  WHEN
-!     THESE BOUNDS ARE APPLIED THE PASSED SPECIFIC HUMIDITY 
-!     ARRAY IS ADJUSTED AS NECESSARY TO PRODUCE THE SET RELATIVE
-!     HUMIDITY.
-!   .     
-!     
-! PROGRAM HISTORY LOG:
-!   ??-??-??  DENNIS DEAVEN
-!   92-12-22  RUSS TREADON - MODIFIED AS DESCRIBED ABOVE.
-!   98-06-08  T BLACK      - CONVERSION FROM 1-D TO 2-D
-!   98-08-18  MIKE BALDWIN - MODIFY TO COMPUTE RH OVER ICE AS IN MODEL
-!   98-12-16  GEOFF MANIKIN - UNDO RH COMPUTATION OVER ICE
-!   00-01-04  JIM TUCCILLO - MPI VERSION
-!   02-06-11  MIKE BALDWIN - WRF VERSION
-!   13-08-13  S. Moorthi   - Threading
-!   06-03-19  Wen Meng     - MODIFY TOP PRESSURE to 1 PA
-!     
-! USAGE:    CALL CALRH(P1,T1,Q1,RH)
-!   INPUT ARGUMENT LIST:
-!     P1     - PRESSURE (PA)
-!     T1     - TEMPERATURE (K)
-!     Q1     - SPECIFIC HUMIDITY (KG/KG)
+!> @file
 !
-!   OUTPUT ARGUMENT LIST: 
-!     RH     - RELATIVE HUMIDITY  (DECIMAL FORM)
-!     Q1     - ADJUSTED SPECIFIC HUMIDITY (KG/KG)
-!     
-!   OUTPUT FILES:
-!     NONE
-!     
-!   SUBPROGRAMS CALLED:
-!     UTILITIES:
-!     LIBRARY:
-!       NONE
-!     
-!   ATTRIBUTES:
-!     LANGUAGE: FORTRAN
-!     MACHINE : CRAY C-90
-!$$$  
+!> SUBPROGRAM:    CALRH       COMPUTES RELATIVE HUMIDITY
+!!   PRGRMMR: TREADON         ORG: W/NP2      DATE: 92-12-22       
+!!     
+!! ABSTRACT:  
+!!     THIS ROUTINE COMPUTES RELATIVE HUMIDITY GIVEN PRESSURE, 
+!!     TEMPERATURE, SPECIFIC HUMIDITY. AN UPPER AND LOWER BOUND
+!!     OF 100 AND 1 PERCENT RELATIVE HUMIDITY IS ENFORCED.  WHEN
+!!     THESE BOUNDS ARE APPLIED THE PASSED SPECIFIC HUMIDITY 
+!!     ARRAY IS ADJUSTED AS NECESSARY TO PRODUCE THE SET RELATIVE
+!!     HUMIDITY.
+!!     
+!! PROGRAM HISTORY LOG:
+!!   ??-??-??  DENNIS DEAVEN
+!!   92-12-22  RUSS TREADON - MODIFIED AS DESCRIBED ABOVE.
+!!   98-06-08  T BLACK      - CONVERSION FROM 1-D TO 2-D
+!!   98-08-18  MIKE BALDWIN - MODIFY TO COMPUTE RH OVER ICE AS IN MODEL
+!!   98-12-16  GEOFF MANIKIN - UNDO RH COMPUTATION OVER ICE
+!!   00-01-04  JIM TUCCILLO - MPI VERSION
+!!   02-06-11  MIKE BALDWIN - WRF VERSION
+!!   13-08-13  S. Moorthi   - Threading
+!!   06-03-19  Wen Meng     - MODIFY TOP PRESSURE to 1 PA
+!!     
+!! USAGE:    CALL CALRH(P1,T1,Q1,RH)
+!!   INPUT ARGUMENT LIST:
+!!     P1     - PRESSURE (PA)
+!!     T1     - TEMPERATURE (K)
+!!     Q1     - SPECIFIC HUMIDITY (KG/KG)
+!!
+!!   OUTPUT ARGUMENT LIST: 
+!!     RH     - RELATIVE HUMIDITY  (DECIMAL FORM)
+!!     Q1     - ADJUSTED SPECIFIC HUMIDITY (KG/KG)
+!!     
+!!   OUTPUT FILES:
+!!     NONE
+!!     
+!!   SUBPROGRAMS CALLED:
+!!     UTILITIES:
+!!     LIBRARY:
+!!       NONE
+!!     
+!!   ATTRIBUTES:
+!!     LANGUAGE: FORTRAN
+!!     MACHINE : CRAY C-90
+!!
+      SUBROUTINE CALRH_GFS(P1,T1,Q1,RH)
+
 !
       use params_mod, only: rhmin
       use ctlblk_mod, only: jsta, jend, spval, im
@@ -179,9 +179,9 @@
       x=xmin+(jx-1)*xinc
       
       tr=con_ttp/x
-      if(x.ge.tliq) then
+      if(x>=tliq) then
         tbpvs(jx)=con_psat*(tr**xponal)*exp(xponbl*(1.-tr))
-      elseif(x.lt.tice) then
+      elseif(x<tice) then
         tbpvs(jx)=con_psat*(tr**xponai)*exp(xponbi*(1.-tr))
       else
         w=(t-tice)/(tliq-tice)
@@ -193,9 +193,9 @@
       xp1=xmin+(jx-1+1)*xinc      
      
       tr=con_ttp/xp1
-      if(xp1.ge.tliq) then
+      if(xp1>=tliq) then
         tbpvs(jx+1)=con_psat*(tr**xponal)*exp(xponbl*(1.-tr))
-      elseif(xp1.lt.tice) then
+      elseif(xp1<tice) then
         tbpvs(jx+1)=con_psat*(tr**xponai)*exp(xponbi*(1.-tr))
       else
         w=(t-tice)/(tliq-tice)

@@ -1,39 +1,39 @@
+!> @file
+!
+!> SUBPROGRAM:    CALUPDHEL      COMPUTES UPDRAFT HELICITY
+!!   PRGRMMR: PYLE            ORG: W/NP2      DATE: 07-10-22       
+!!     
+!! ABSTRACT:  
+!!     THIS ROUTINE COMPUTES THE UPDRAFT HELICITY
+!!     
+!! PROGRAM HISTORY LOG:
+!!   07-10-22  M PYLE - based on SPC Algorithm courtesy of David Bright
+!!   11-01-11  M Pyle - converted to F90 for unified post
+!!   11-04-05  H Chuang - added B grid option
+!!     
+!! USAGE:    CALL CALUPDHEL(UPDHEL)
+!!
+!!   INPUT ARGUMENT LIST:
+!!     NONE
+!!
+!!   OUTPUT ARGUMENT LIST: 
+!!     UPDHEL   - UPDRAFT HELICITY (M^2/S^2)
+!!     
+!!   OUTPUT FILES:
+!!     NONE
+!!     
+!!   SUBPROGRAMS CALLED:
+!!     UTILITIES:
+!!       NONE
+!!     LIBRARY:
+!!       COMMON   - CTLBLK
+!!     
+!!   ATTRIBUTES:
+!!     LANGUAGE: FORTRAN
+!!     MACHINE : CRAY C-90
+!!
       SUBROUTINE CALUPDHEL(UPDHEL)
-!$$$  SUBPROGRAM DOCUMENTATION BLOCK
-!                .      .    .     
-! SUBPROGRAM:    CALUPDHEL      COMPUTES UPDRAFT HELICITY
-!   PRGRMMR: PYLE            ORG: W/NP2      DATE: 07-10-22       
-!     
-! ABSTRACT:  
-!     THIS ROUTINE COMPUTES THE UPDRAFT HELICITY
-!   .     
-!     
-! PROGRAM HISTORY LOG:
-!   07-10-22  M PYLE - based on SPC Algorithm courtesy of David Bright
-!   11-01-11  M Pyle - converted to F90 for unified post
-!   11-04-05  H Chuang - added B grid option
-!     
-! USAGE:    CALL CALUPDHEL(UPDHEL)
-!
-!   INPUT ARGUMENT LIST:
-!     NONE
-!
-!   OUTPUT ARGUMENT LIST: 
-!     UPDHEL   - UPDRAFT HELICITY (M^2/S^2)
-!     
-!   OUTPUT FILES:
-!     NONE
-!     
-!   SUBPROGRAMS CALLED:
-!     UTILITIES:
-!       NONE
-!     LIBRARY:
-!       COMMON   - CTLBLK
-!     
-!   ATTRIBUTES:
-!     LANGUAGE: FORTRAN
-!     MACHINE : CRAY C-90
-!$$$  
+
 !     
 !
 !      use vrbls2d, only:
@@ -109,11 +109,11 @@
               EXIT l_loop
             END IF 
 
-            IF ( (ZMIDLOC - HTSFC(I,J)) .ge. HLOWER  .AND.  &
-                 (ZMIDLOC - HTSFC(I,J)) .le. HUPPER ) THEN
+            IF ( (ZMIDLOC - HTSFC(I,J)) >= HLOWER  .AND.  &
+                 (ZMIDLOC - HTSFC(I,J)) <= HUPPER ) THEN
               DZ=(ZINT(I,J,L)-ZINT(I,J,L+1))
 
-              IF (WH(I,J,L) .lt. 0) THEN
+              IF (WH(I,J,L) < 0) THEN
 
 !          ANY DOWNWARD MOTION IN 2-5 km LAYER KILLS COMPUTATION AND
 !          SETS RESULTANT UPDRAFT HELICTY TO ZERO

@@ -1,17 +1,21 @@
+# This is the CMake build file for EMC_post (also known as UPP).
+#
 cmake_minimum_required(VERSION 3.15)
 
 file(STRINGS "VERSION" pVersion LIMIT_COUNT 1)
 
 project(
-  nceppost
+  upp
   VERSION ${pVersion}
   LANGUAGES Fortran)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules/Modules")
 
+# Handle user options.
 option(OPENMP "use OpenMP threading" OFF)
 option(BUILD_POSTEXEC "Build NCEPpost executable" ON)
 option(BUILD_WITH_WRFIO "Build NCEPpost with WRF-IO library" OFF)
+option(ENABLE_DOCS "Enable generation of doxygen-based documentation." OFF)
 
 if(NOT CMAKE_BUILD_TYPE MATCHES "^(Debug|Release|RelWithDebInfo|MinSizeRel)$")
   message(STATUS "Setting build type to 'Release' as none was specified.")
@@ -27,7 +31,8 @@ if(NOT CMAKE_Fortran_COMPILER_ID MATCHES "^(Intel|GNU|Clang|AppleClang)$")
 endif()
 
 find_package(MPI REQUIRED)
-find_package(NetCDF REQUIRED COMPONENTS Fortran)
+find_package(NetCDF REQUIRED C Fortran)
+#find_package(NetCDF REQUIRED COMPONENTS Fortran)
 
 if(OPENMP)
   find_package(OpenMP REQUIRED COMPONENTS Fortran)
@@ -55,3 +60,10 @@ endif()
 
 add_subdirectory(sorc)
 add_subdirectory(parm)
+
+# If desired, build the doxygen docs.
+if(ENABLE_DOCS)
+  find_package(Doxygen REQUIRED)
+  add_subdirectory(docs)  
+endif()
+
