@@ -12,8 +12,8 @@
 
         function rtc()
         implicit none
-        real et(2), etime
-        real*8 rtc
+        real et(2)
+        real*8 rtc, etime
         rtc=etime(et)
         rtc=rtc*1.e3
         end

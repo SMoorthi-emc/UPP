@@ -99,7 +99,7 @@
                             mpi_comm_comp, im, jm, prec_acc_dt1
       use rqstfld_mod, only: iget, lvls, id, iavblfld, lvlsxml
 
-      use mersenne_twister, only: random_number, random_setseed
+!     use mersenne_twister, only: random_number, random_setseed
 !- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
        implicit none
 !
@@ -3876,13 +3876,13 @@
 
              write(0,*)'in SURFCE,me=',me,'sdat=',sdat,' ihrst=',ihrst,' ifhr=',ifhr,' ifmin=',ifmin
 ! BOURGOUIN ALGORITHM
-!            ISEED=44641*(INT(SDAT(1)-1)*24*31+INT(SDAT(2))*24+IHRST)+   &
-!    &             MOD(IFHR*60+IFMIN,44641)+4357
+             ISEED=44641*(INT(SDAT(1)-1)*24*31+INT(SDAT(2))*24+IHRST)+   &
+     &             MOD(IFHR*60+IFMIN,44641)+4357
 
-             iseed0 = sdat(1) + sdat(2) + sdat(3) + ihrst
-             call random_setseed(iseed0)
-             call random_number(wrk)
-             iseed = iseed0 + nint(wrk(1)*1000.0d0) + ifhr + ifmin
+!            iseed0 = sdat(1) + sdat(2) + sdat(3) + ihrst
+!            call random_setseed(iseed0)
+!            call random_number(wrk)
+!            iseed = iseed0 + nint(wrk(1)*1000.0d0) + ifhr + ifmin
              
              CALL CALWXT_BOURG_POST(IM,JM,JSTA_2L,JEND_2U,JSTA,JEND,LM,LP1,&
      &                              ISEED,G,PTHRESH,                       &
@@ -4082,13 +4082,13 @@
            ENDDO
 
 ! BOURGOUIN ALGORITHM
-!          ISEED=44641*(INT(SDAT(1)-1)*24*31+INT(SDAT(2))*24+IHRST)+   &
-!    &           MOD(IFHR*60+IFMIN,44641)+4357
+           ISEED=44641*(INT(SDAT(1)-1)*24*31+INT(SDAT(2))*24+IHRST)+   &
+     &           MOD(IFHR*60+IFMIN,44641)+4357
 
-             iseed0 = sdat(1) + sdat(2) + sdat(3) + ihrst
-             call random_setseed(iseed0)
-             call random_number(wrk)
-             iseed = iseed0 + nint(wrk(1)*1000.0d0) + ifhr + ifmin
+!            iseed0 = sdat(1) + sdat(2) + sdat(3) + ihrst
+!            call random_setseed(iseed0)
+!            call random_number(wrk)
+!            iseed = iseed0 + nint(wrk(1)*1000.0d0) + ifhr + ifmin
 
            CALL CALWXT_BOURG_POST(IM,JM,JSTA_2L,JEND_2U,JSTA,JEND,LM,LP1,&
      &                        ISEED,G,PTHRESH,                           &
