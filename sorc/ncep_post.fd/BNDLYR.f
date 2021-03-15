@@ -30,6 +30,7 @@
 !!   98-12-22  MIKE BALDWIN - BACK OUT RH OVER ICE
 !!   00-01-04  JIM TUCCILLO - MPI VERSION 
 !!   02-01-15  MIKE BALDWIN - WRF VERSION
+!!   20-11-10  JESSE MENG   - USE UPP_PHYSICS MODULE
 !!     
 !!     USAGE:    CALL BNDLYR(PBND,TBND,QBND,RHBND,UBND,VBND,
 !!                            WBND,OMGBND,PWTBND,QCNVBND)
@@ -71,15 +72,15 @@
       use masks,      only: lmh
       use params_mod, only: d00, gi, pq0, a2, a3, a4
       use ctlblk_mod, only: jsta_2l, jend_2u, lm, jsta, jend, modelname,      &
-                            jsta_m, jend_m, im, nbnd
+                            jsta_m, jend_m, im, nbnd, spval
       use physcons_post,   only: con_rd, con_rv, con_eps, con_epsm1
       use gridspec_mod, only: gridtype
+      use upp_physics, only: FPVSNEW
 !
       implicit none
 !
 !     DECLARE VARIABLES.
 !
-      real,external :: FPVSNEW
       real,PARAMETER :: DPBND=30.E2
       integer, dimension(IM,jsta:jend,NBND),intent(inout) :: LVLBND
       real,    dimension(IM,jsta:jend,NBND),intent(inout) :: PBND,TBND,  &
@@ -179,6 +180,7 @@
             DO I=1,IM
 !
               PM = PMID(I,J,L)
+              IF(PM<SPVAL)THEN
               IF((PBINT(I,J,LBND)   >= PM).AND.              & 
                  (PBINT(I,J,LBND+1) <= PM)) THEN
                 DP = PINT(I,J,L+1) - PINT(I,J,L)
@@ -203,6 +205,7 @@
                   QSAT = PQ0/PM*EXP(A2*(T(I,J,L)-A3)/(T(I,J,L)-A4))
                 END IF 
                 QSBND(I,J,LBND) = QSBND(I,J,LBND) + QSAT*DP
+              ENDIF
               ENDIF
             ENDDO
           ENDDO
@@ -332,7 +335,7 @@
               END IF 
               WBND(I,J,LBND)    = WH(I,J,L)
               QCNVBND(I,J,LBND) = QCNVG(I,J,L)
-              IF(MODELNAME == 'GFS')THEN
+              IF(MODELNAME == 'GFS' .OR. MODELNAME == 'FV3R')THEN
                 ES   = FPVSNEW(T(I,J,L))
                 ES   = MIN(ES,PM)
                 QSAT = CON_EPS*ES/(PM+CON_EPSM1*ES)

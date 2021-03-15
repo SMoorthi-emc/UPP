@@ -14,6 +14,7 @@
 !!                        SU diagnostic fields
 !! -  19-07-24  Li(Kate) Zhang - Merge and update NGAC UPP for FV3-Chem
 !! -  19-11-23  Wen Meng - Add sea ice skin T
+!! -  20-11-06  Jesse Meng - Add UPP_MATH module variables
 !!
 !!   OUTPUT FILES:
 !!   - STDOUT  - RUN TIME STANDARD OUT.
@@ -30,6 +31,7 @@
       use vrbls2d
       use soil
       use masks
+      use upp_math, only: ddvdx, ddudy, uuavg
 !
       !use params_mod
       use ctlblk_mod
@@ -441,6 +443,12 @@
       allocate(avgetrans(im,jsta_2l:jend_2u))
       allocate(avgesnow(im,jsta_2l:jend_2u))
       allocate(avgpotevp(im,jsta_2l:jend_2u))
+      allocate(aod550(im,jsta_2l:jend_2u))
+      allocate(du_aod550(im,jsta_2l:jend_2u))
+      allocate(ss_aod550(im,jsta_2l:jend_2u))
+      allocate(su_aod550(im,jsta_2l:jend_2u))
+      allocate(oc_aod550(im,jsta_2l:jend_2u))
+      allocate(bc_aod550(im,jsta_2l:jend_2u))
 !
 !     FROM MASKS
 !
@@ -535,5 +543,9 @@
       allocate(acswupt(im,jsta_2l:jend_2u))
       allocate(swdnt(im,jsta_2l:jend_2u))
       allocate(acswdnt(im,jsta_2l:jend_2u))
+! UPP_MATH MODULE DIFFERENTIAL EQUATIONS
+      allocate(ddvdx(im,jsta_2l:jend_2u))
+      allocate(ddudy(im,jsta_2l:jend_2u))
+      allocate(uuavg(im,jsta_2l:jend_2u))
 ! 
       end

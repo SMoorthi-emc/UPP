@@ -33,6 +33,7 @@
 !!   15-07-04  SARAH LU     - CORRECT PW INTEGRATION FOR AOD (17)
 !!   15-07-10  SARAH LU     - UPDATE TO CALCULATE ASYMETRY PARAMETER
 !!   19-07-25  Li(Kate) Zhang - MERGE SARHA LU's update for FV3-Chem
+!!   20-11-10  JESSE MENG   - USE UPP_PHYSICS MODULE
 !!     
 !! USAGE:    CALL CALPW(PW)
 !!   INPUT ARGUMENT LIST:
@@ -64,7 +65,8 @@
       use vrbls4d,    only: smoke
       use masks,      only: htm
       use params_mod, only: tfrz, gi
-      use ctlblk_mod, only: lm, jsta, jend, im
+      use ctlblk_mod, only: lm, jsta, jend, im, spval
+      use upp_physics, only: FPVSNEW
 !- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       implicit none
 !     
@@ -83,7 +85,6 @@
       real,dimension(IM,jsta:jend),intent(inout) :: PW
       INTEGER LLMH,I,J,L
       REAL ALPM,DZ,PM,PWSUM,RHOAIR,DP,ES
-      real,external :: FPVSNEW
       REAL QDUM(IM,jsta:jend), PWS(IM,jsta:jend),QS(IM,jsta:jend)
 !
 !***************************************************************
@@ -289,6 +290,7 @@
 !$omp  parallel do private(i,j,dp)
         DO J=JSTA,JEND
           DO I=1,IM
+            if(PINT(I,J,L+1) <spval .and. Qdum(I,J) < spval) then
              DP      = PINT(I,J,L+1) - PINT(I,J,L)
              PW(I,J) = PW(I,J) + Qdum(I,J)*DP*GI*HTM(I,J,L)
             IF (IDECID == 17 .or. IDECID == 20 .or. IDECID == 21) THEN
@@ -298,6 +300,10 @@
              PW(I,J) = PW(I,J) + Qdum(I,J)
             ENDIF
             IF (IDECID == 14) PWS(I,J) = PWS(I,J) + QS(I,J)*DP*GI*HTM(I,J,L)
+            else
+             PW(I,J) = spval
+             PWS(I,J) = spval
+            endif
           ENDDO
         ENDDO
       ENDDO                 ! l loop
@@ -307,7 +313,9 @@
 !$omp  parallel do private(i,j,dp)
         DO J=JSTA,JEND
           DO I=1,IM
+            if( PW(I,J)<spval) then
             PW(I,J) = max(0.,PW(I,J)/PWS(I,J)*100.) 
+            endif
           ENDDO
         ENDDO
       END IF
@@ -318,7 +326,9 @@
 !$omp  parallel do private(i,j)
         DO J=JSTA,JEND
           DO I=1,IM
+            if( PW(I,J)<spval) then
             PW(I,J) = PW(I,J) / 2.14e-5
+            endif
           ENDDO
         ENDDO
       endif

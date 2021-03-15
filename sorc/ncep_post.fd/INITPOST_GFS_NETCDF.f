@@ -63,7 +63,7 @@
               avgedir,avgecan,avgetrans,avgesnow,avgprec_cont,avgcprate_cont,rel_vort_max, &
               avisbeamswin,avisdiffswin,airbeamswin,airdiffswin,refdm10c_max,wspd10max, &
               alwoutc,alwtoac,aswoutc,aswtoac,alwinc,aswinc,avgpotevp,snoavg, &
-              ti 
+              ti,aod550,du_aod550,ss_aod550,su_aod550,oc_aod550,bc_aod550
       use soil,  only: sldpth, sh2o, smc, stc
       use masks, only: lmv, lmh, htm, vtm, gdlat, gdlon, dx, dy, hbm2, sm, sice
       use physcons_post,   only: grav => con_g, fv => con_fvirt, rgas => con_rd,                     &
@@ -76,11 +76,12 @@
               jend_m, imin, imp_physics, dt, spval, pdtop, pt, qmin, nbin_du, nphs, dtq2, ardlw,&
               ardsw, asrfc, avrain, avcnvc, theat, gdsdegr, spl, lsm, alsl, im, jm, im_jm, lm,  &
               jsta_2l, jend_2u, nsoil, lp1, icu_physics, ivegsrc, novegtype, nbin_ss, nbin_bc,  &
-              nbin_oc, nbin_su, gocart_on, pt_tbl, hyb_sigp, filenameFlux, fileNameAER
+              nbin_oc, nbin_su, gocart_on, pt_tbl, hyb_sigp, filenameFlux, fileNameAER,rdaod
       use gridspec_mod, only: maptype, gridtype, latstart, latlast, lonstart, lonlast, cenlon,  &
               dxval, dyval, truelat2, truelat1, psmapf, cenlat,lonstartv, lonlastv, cenlonv,    &
               latstartv, latlastv, cenlatv,latstart_r,latlast_r,lonstart_r,lonlast_r
       use rqstfld_mod,  only: igds, avbl, iq, is
+      use upp_physics, only: fpvsnew
 !- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
       implicit none
 !
@@ -104,7 +105,6 @@
 !     real,parameter:: con_eps     =con_rd/con_rv
 !     real,parameter:: con_epsm1   =con_rd/con_rv-1
 !
-!     real,external::FPVSNEW
 ! This version of INITPOST shows how to initialize, open, read from, and
 ! close a NetCDF dataset. In order to change it to read an internal (binary)
 ! dataset, do a global replacement of _ncd_ with _int_. 
@@ -149,7 +149,6 @@
       integer ncid3d,ncid2d,varid,nhcas
       real    TSTART,TLMH,TSPH,ES,FACT,soilayert,soilayerb,zhour,dum,  &
               tvll,pmll,tv, tx1, tx2
-      real, external :: fpvsnew
 
       character*20,allocatable :: recname(:)
       integer,     allocatable :: reclev(:), kmsk(:,:)
@@ -2006,6 +2005,34 @@
           if (qwbs(i,j) /= spval) qwbs(i,j) = -qwbs(i,j)
         enddo
       enddo
+
+      if(me==0)print*,'rdaod= ',rdaod
+! inst aod550 optical depth
+      if(rdaod) then
+      VarName='aod550'
+      call read_netcdf_2d_scatter(ncid2d,im,jsta,jsta_2l,jend,jend_2u, &
+      spval,VarName,aod550)
+
+      VarName='du_aod550'
+      call read_netcdf_2d_scatter(ncid2d,im,jsta,jsta_2l,jend,jend_2u, &
+      spval,VarName,du_aod550)
+
+      VarName='ss_aod550'
+      call read_netcdf_2d_scatter(ncid2d,im,jsta,jsta_2l,jend,jend_2u, &
+      spval,VarName,ss_aod550)
+
+      VarName='su_aod550'
+      call read_netcdf_2d_scatter(ncid2d,im,jsta,jsta_2l,jend,jend_2u, &
+      spval,VarName,su_aod550)
+
+      VarName='oc_aod550'
+      call read_netcdf_2d_scatter(ncid2d,im,jsta,jsta_2l,jend,jend_2u, &
+      spval,VarName,oc_aod550)
+
+      VarName='bc_aod550'
+      call read_netcdf_2d_scatter(ncid2d,im,jsta,jsta_2l,jend,jend_2u, &
+      spval,VarName,bc_aod550)
+      end if
 
 ! time averaged ground heat flux using nemsio
       VarName='gflux_ave'

@@ -40,6 +40,7 @@
       use masks
       use params_mod
       use ctlblk_mod
+      use upp_math, only: ddvdx, ddudy, uuavg
 !- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 !
        implicit none
@@ -369,6 +370,11 @@
       deallocate(avgesnow)
       deallocate(avgpotevp)
       deallocate(ti)
+      deallocate(du_aod550)
+      deallocate(ss_aod550)
+      deallocate(su_aod550)
+      deallocate(bc_aod550)
+      deallocate(oc_aod550)
 ! GSD
       deallocate(rainc_bucket)
       deallocate(rainc_bucket1)
@@ -540,5 +546,9 @@
       deallocate(acswupt)
       deallocate(swdnt)
       deallocate(acswdnt)
+! UPP_MATH MODULE DIFFERENTIAL EQUATIONS
+      deallocate(ddvdx)
+      deallocate(ddudy)
+      deallocate(uuavg)
       
       end

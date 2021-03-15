@@ -39,6 +39,9 @@
 !!   15-11-03  S Moorthi - fix a bug in "RELATIVE HUMIDITY ON MDLSURFACES" sectio logic
 !!   19-10-30  Bo CUI - REMOVE "GOTO" STATEMENT
 !!   20-03-24  J MENG - remove grib1
+!!   20-05-20  J MENG - CALRH unification with NAM scheme
+!!   20-11-10  J MENG - USE UPP_MATH MODULE
+!!   20-11-10  J MENG - USE UPP_PHYSICS MODULE
 !!
 !! USAGE:    CALL MDLFLD
 !!   INPUT ARGUMENT LIST:
@@ -94,6 +97,8 @@
               me, dt, avrain, theat, ifhr, ifmin, avcnvc, lp1, im, jm
       use rqstfld_mod, only: iget, id, lvls, iavblfld, lvlsxml
       use gridspec_mod, only: gridtype,maptype,dxval
+      use upp_physics, only: CALRH, CALCAPE
+      use upp_math, only: H2U, H2V, U2H, V2H
 
 !     
 !- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -175,8 +180,19 @@
 !
 ! Set up logical flag to indicate whether model outputs radar directly
       Model_Radar = .false.
-      IF (ABS(MAXVAL(REF_10CM)-SPVAL) > SMALL) Model_Radar = .True.
-      if(me == 0) print*,'Did post read in model derived radar ref ',Model_Radar
+!      IF (ABS(MAXVAL(REF_10CM)-SPVAL)>SMALL)Model_Radar=.True.
+      check_ref: DO L=1,LM
+        DO J=JSTA,JEND
+          DO I=1,IM
+            IF(ABS(REF_10CM(I,J,L)-SPVAL) > SMALL) THEN
+              Model_Radar = .True.
+              exit check_ref
+            ENDIF
+          ENDDO
+        ENDDO
+      ENDDO check_ref
+      if (me == 0) print*,'Did post read in model derived radar ref ',Model_Radar, &
+        'MODELNAME=',trim(MODELNAME),'imp_physics=',imp_physics
       ALLOCATE(EL     (IM,JSTA_2L:JEND_2U,LM))     
       ALLOCATE(RICHNO (IM,JSTA_2L:JEND_2U,LM))
       ALLOCATE(PBLRI  (IM,JSTA_2L:JEND_2U))    
@@ -1516,13 +1532,9 @@ refl_adj:                 IF(REF_10CM(I,J,L) <= DBZmin) THEN
                   Q1D(I,J) = Q(I,J,LL)
                 ENDDO
               ENDDO
-              IF(MODELNAME == 'GFS')THEN
-                CALL CALRH_GFS(P1D(1,jsta),T1D(1,jsta),Q1D(1,jsta),EGRID4(1,jsta))
-              ELSE IF (MODELNAME == 'RAPR')THEN
-                CALL CALRH_GSD(P1D(1,jsta),T1D(1,jsta),Q1D(1,jsta),EGRID4(1,jsta))
-              ELSE 
-                CALL CALRH(P1D(1,jsta),T1D(1,jsta),Q1D(1,jsta),EGRID4(1,jsta))
-              END IF               
+
+            CALL CALRH(P1D(1,jsta),T1D(1,jsta),Q1D(1,jsta),EGRID4(1,jsta))
+
 !$omp parallel do private(i,j)
               DO J=JSTA,JEND
                 DO I=1,IM
@@ -2711,8 +2723,10 @@ refl_adj:                 IF(REF_10CM(I,J,L) <= DBZmin) THEN
           DO I=1,IM
             GRID1(I,J)=0.0
             DO L=1,NINT(LMH(I,J))
-              GRID1(I,J)=GRID1(I,J)+0.00344* &
-              (10.**(DBZ(I,J,L)/10.))**0.57143*(ZINT(I,J,L)-ZINT(I,J,L+1))/1000.
+              if(zint(i,j,l) < spval) then
+                GRID1(I,J)=GRID1(I,J)+0.00344* &
+                (10.**(DBZ(I,J,L)/10.))**0.57143*(ZINT(I,J,L)-ZINT(I,J,L+1))/1000.
+              endif
             ENDDO
           ENDDO
         ENDDO
@@ -3593,6 +3607,9 @@ refl_adj:                 IF(REF_10CM(I,J,L) <= DBZmin) THEN
        DO J=JSTA,JEND
         DO I=1,IM
          LPBL(I,J)=LM
+
+         if(ZINT(I,J,NINT(LMH(I,J))+1) <spval) then
+
          ZSFC=ZINT(I,J,NINT(LMH(I,J))+1)
          loopL:DO L=NINT(LMH(I,J)),1,-1
           IF(MODELNAME=='RAPR') THEN
@@ -3608,6 +3625,10 @@ refl_adj:                 IF(REF_10CM(I,J,L) <= DBZmin) THEN
            EXIT loopL 
           END IF
          ENDDO loopL
+
+         else
+           LPBL(I,J) = LM
+         endif
          if(lpbl(i,j)<1)print*,'zero lpbl',i,j,pblri(i,j),lpbl(i,j)
         ENDDO
        ENDDO

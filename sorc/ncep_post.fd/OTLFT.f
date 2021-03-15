@@ -18,6 +18,7 @@
 !!   00-01-04  JIM TUCCILLO - MPI VERSION
 !!   02-06-17  MIKE BALDWIN - WRF VERSION
 !!   11-04-12  GEOFF MANIKIN - USE VIRTUAL TEMPERATURE
+!!   20-11-10  JESSE MENG   - USE UPP_PHYSICS MODULE
 !!     
 !! USAGE:    CALL OTLFT(PBND,TBND,QBND,SLINDX)
 !!   INPUT ARGUMENT LIST:
@@ -51,14 +52,14 @@
       use vrbls2d,    only: T500
       use lookup_mod, only: THL, RDTH, JTB, QS0, SQS, RDQ, ITB, PTBL, &
                             PL, RDP, THE0, STHE, RDTHE, TTBL
-      use ctlblk_mod, only: JSTA, JEND, IM
+      use ctlblk_mod, only: JSTA, JEND, IM, spval
       use params_mod, only: D00, H10E5, CAPA, ELOCP, EPS, ONEPS
+      use upp_physics, only: FPVSNEW
 !- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
        implicit none
 !
 !     SET LOCAL PARAMETERS.
        real,PARAMETER :: D8202=.820231E0 , H5E4=5.E4 , P500=50000.
-       real,external::FPVSNEW
 
 !     
 !     DECLARE VARIABLES.
@@ -91,6 +92,9 @@
         DO I=1,IM
           TBT = TBND(I,J) 
           QBT = QBND(I,J)
+!
+          if( TBT < spval ) then
+
           APEBT = (H10E5/PBND(I,J))**CAPA
 !
 !--------------SCALING POTENTIAL TEMPERATURE & TABLE INDEX--------------
@@ -231,6 +235,10 @@
            QSATP=EPS*ESATP/(P500-ESATP*ONEPS)
            TVP=PARTMP*(1+0.608*QSATP)
            SLINDX(I,J)=T500(I,J)-TVP
+
+           else
+             SLINDX(I,J)=spval
+           endif
          END DO
        END DO
 !     

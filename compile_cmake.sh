@@ -6,6 +6,10 @@ set -x
 . $MODULESHOME/init/sh
 module purge
 
+#
+#  Make sure the directory "CMakeModules/Modules" exists!
+#  if not do "git submodule update --init --recursive"
+#
  if [ $machine = wcoss_dell_p3 ] ; then
    module load ips/18.0.1.163
    module load impi/18.0.1

@@ -18,6 +18,7 @@
 !!   01-10-25  H CHUANG - MODIFIED TO PROCESS HYBRID MODEL OUTPUT
 !!   02-06-11  MIKE BALDWIN - WRF VERSION
 !!   11-04-12  GEOFF MANIKIN - USE VIRTUAL TEMPERATURE
+!!   20-11-10  JESSE MENG   - USE UPP_PHYSICS MODULE
 !!     
 !! USAGE:    CALL OTLIFT(SLINDX)
 !!   INPUT ARGUMENT LIST:
@@ -46,8 +47,9 @@
       use masks,      only: LMH
       use lookup_mod, only: THL, RDTH, JTB, QS0, SQS, RDQ,ITB, PTBL, PL, &
                             RDP, THE0, STHE, RDTHE, TTBL
-      use ctlblk_mod, only: JSTA, JEND, IM
+      use ctlblk_mod, only: JSTA, JEND, IM, SPVAL
       use params_mod, only: D00,H10E5, CAPA, ELOCP, EPS, ONEPS
+      use upp_physics, only: FPVSNEW
 !
 
 !
@@ -55,7 +57,6 @@
 !
 !     SET LOCAL PARAMETERS.
        real,PARAMETER :: D8202=.820231E0 , H5E4=5.E4 , P500=50000.
-       real,external::FPVSNEW
 
 !     
 !     DECLARE VARIABLES.
@@ -84,6 +85,7 @@
       DO J=JSTA,JEND
         DO I=1,IM
           LBTM=NINT(LMH(I,J))
+          IF(T(I,J,LBTM)<SPVAL .AND. Q(I,J,LBTM)<SPVAL) THEN
           TBT = T(I,J,LBTM)
           QBT = Q(I,J,LBTM)
           APEBT = (H10E5/PMID(I,J,LBTM))**CAPA
@@ -195,6 +197,7 @@
          QSATP=EPS*ESATP/(P500-ESATP*ONEPS)
          TVP=PARTMP*(1+0.608*QSATP)
          SLINDX(I,J)=T500(I,J)-TVP
+        ENDIF !end T(I,J,LBTM)<SPVAL 
         ENDDO
       ENDDO
 !       write(*,*) ' in otlift t500 partmp ',t500(1,1),partmp(1,1)
