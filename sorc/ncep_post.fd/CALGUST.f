@@ -113,19 +113,20 @@
              IE = I + MOD(J+1,2) 
              IW = I + MOD(J+1,2)-1
 
-           if(U10H(I,J)<spval.and.UH(I,J+1,L)<spval.and.UH(IE,J,L)<spval.and.UH(IW,J,L)<spval.and.UH(I,J-1,L)<spval) then
+             if(U10H(I,J)<spval.and.UH(I,J+1,L)<spval.and.UH(IE,J,L)<spval&
+                               .and.UH(IW,J,L)<spval .and.UH(I,J-1,L)<spval) then
 
 !        USFC=D25*(U10(I,J-1)+U10(IW,J)+U10(IE,J)+U10(I,J+1)) 
 !        VSFC=D25*(V10(I,J-1)+V10(IW,J)+V10(IE,J)+V10(I,J+1))
-             USFC = U10H(I,J)
-             VSFC = V10H(I,J)
-             SFCWIND = SQRT(USFC*USFC + VSFC*VSFC)
-             U0   = D25*(UH(I,J-1,L)+UH(IW,J,L)+UH(IE,J,L)+UH(I,J+1,L))
-             V0   = D25*(VH(I,J-1,L)+VH(IW,J,L)+VH(IE,J,L)+VH(I,J+1,L))
-             WIND = SQRT(U0*U0 + V0*V0)
+               USFC = U10H(I,J)
+               VSFC = V10H(I,J)
+               SFCWIND = SQRT(USFC*USFC + VSFC*VSFC)
+               U0   = D25*(UH(I,J-1,L)+UH(IW,J,L)+UH(IE,J,L)+UH(I,J+1,L))
+               V0   = D25*(VH(I,J-1,L)+VH(IW,J,L)+VH(IE,J,L)+VH(I,J+1,L))
+               WIND = SQRT(U0*U0 + V0*V0)
 
              else
-             WIND = spval
+               WIND = spval
              endif
 
            ELSE IF(gridtype == 'B') THEN
@@ -137,14 +138,14 @@
 
              if(U10H(I,J)<spval.and.UH(IW,J-1,L)<spval) then
 
-             USFC = U10H(I,J)
-             VSFC = V10H(I,J)
-             SFCWIND = SQRT(USFC*USFC + VSFC*VSFC)
-             U0 = D25*(UH(I,J-1,L)+UH(IW,J,L)+UH(IE,J,L)+UH(IW,J-1,L))
-             V0 = D25*(VH(I,J-1,L)+VH(IW,J,L)+VH(IE,J,L)+VH(IW,J-1,L))
-             WIND = SQRT(U0*U0 + V0*V0) 
+               USFC = U10H(I,J)
+               VSFC = V10H(I,J)
+               SFCWIND = SQRT(USFC*USFC + VSFC*VSFC)
+               U0 = D25*(UH(I,J-1,L)+UH(IW,J,L)+UH(IE,J,L)+UH(IW,J-1,L))
+               V0 = D25*(VH(I,J-1,L)+VH(IW,J,L)+VH(IE,J,L)+VH(IW,J-1,L))
+              WIND = SQRT(U0*U0 + V0*V0) 
              else
-             WIND = spval
+               WIND = spval
              endif
            ELSE IF(gridtype == 'A') THEN
 
