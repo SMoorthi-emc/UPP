@@ -3741,8 +3741,8 @@
             GRID1(I,J) = PSLP(I,J)
           ENDDO
         ENDDO
-        print *,'inmdl2p,pslp=',maxval(pslp(1:im,jsta:jend)),minval(pslp(1:im,jsta:jend))
-        print *,'inmdl2p,point pslp=',pslp(im/2,(jsta+jend)/2),pslp(1,jsta),'cfld=',cfld
+!       print *,'inmdl2p,pslp=',maxval(pslp(1:im,jsta:jend)),minval(pslp(1:im,jsta:jend))
+!       print *,'inmdl2p,point pslp=',pslp(im/2,(jsta+jend)/2),pslp(1,jsta),'cfld=',cfld
         if(grib == 'grib2')then
           cfld = cfld + 1
           fld_info(cfld)%ifld = IAVBLFLD(IGET(023))

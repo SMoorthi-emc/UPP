@@ -3871,7 +3871,7 @@
                ENDDO
              ENDDO
 
-             write(0,*)'in SURFCE,me=',me,'sdat=',sdat,' ihrst=',ihrst,' ifhr=',ifhr,' ifmin=',ifmin
+!            write(0,*)'in SURFCE,me=',me,'sdat=',sdat,' ihrst=',ihrst,' ifhr=',ifhr,' ifmin=',ifmin
 ! BOURGOUIN ALGORITHM
              ISEED=44641*(INT(SDAT(1)-1)*24*31+INT(SDAT(2))*24+IHRST)+   &
      &             MOD(IFHR*60+IFMIN,44641)+4357

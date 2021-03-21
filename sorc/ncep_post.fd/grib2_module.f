@@ -208,7 +208,7 @@
 !
     include 'mpif.h'
 !
-!    real,intent(in)      :: data(im,1:jend-jsta+1,ntlfld)
+!   real,intent(in)      :: data(im,1:jend-jsta+1,ntlfld)
     character(255),intent(in) :: post_fname
 !
 !------- local variables
@@ -360,7 +360,7 @@
       allocate(datafld(im_jm,nfld_pe(me+1)) )
 !
       call mpi_alltoallv(datapd,iscnt,isdsp,MPI_REAL,                  &
-        datafldtmp,ircnt,irdsp,MPI_REAL,MPI_COMM_COMP,ierr)
+                         datafldtmp,ircnt,irdsp,MPI_REAL,MPI_COMM_COMP,ierr)
 !
 !--- re-arrange the data
       datafld = 0.
@@ -620,24 +620,24 @@
 !21 Type of processed data in this GRIB message (See Table 1.4)                         ! keys_sec1(13)
 !22-N Reserved
 !
-       call g2sec1(pset%orig_center,pset%sub_center,  &
-               pset%version_no,pset%local_table_vers_no,&
-               pset%sigreftime,nint(sdat(3)),nint(sdat(1)),nint(sdat(2)),ihrst,imin, &
-               isec,pset%prod_status,pset%data_type,listsec1)
+       call g2sec1(pset%orig_center,pset%sub_center,                         &
+                   pset%version_no,pset%local_table_vers_no,                 &
+                   pset%sigreftime,nint(sdat(3)),nint(sdat(1)),nint(sdat(2)),&
+                   ihrst,imin,isec,pset%prod_status,pset%data_type,listsec1)
 !jw : set sect1(2) to 0 to compare with cnvgrb grib file
 ! For GEFS runs we need to set the section 1 values for Grib2
        if(trim(pset%gen_proc)=='gefs') then
          listsec1(2)=2
 ! Settings below for control (1 or 2) vs perturbed (3 or 4) ensemble forecast
-         if(e1_type==1.or.e1_type==2) then
-           listsec1(13)=3
-         elseif(e1_type==3.or.e1_type==4) then
-           listsec1(13)=4
+         if(e1_type==1 .or. e1_type==2) then
+           listsec1(13) = 3
+         elseif(e1_type==3 .or. e1_type==4) then
+           listsec1(13) = 4
          endif
          print *, "After g2sec1 call we need to set listsec1(2) = ",listsec1(2)
          print *, "After g2sec1 call we need to set listsec1(13) = ",listsec1(13)         
        else
-         listsec1(2)=0
+         listsec1(2) = 0
        endif
 !
        call gribcreate(cgrib,max_bytes,listsec0,listsec1,ierr)
