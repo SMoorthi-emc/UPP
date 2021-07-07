@@ -9,6 +9,7 @@
 !!
 !! REVISION HISTORY
 !!   2017-08-11 H Chuang   start from INITPOST_GFS_NEMS_MPIIO.f 
+!!   2021-03-11 Bo Cui     change local arrays to dimension (im,jsta:jend)
 !!
 !! USAGE:    CALL INITPOST_NETCDF
 !!   INPUT ARGUMENT LIST:
@@ -63,7 +64,7 @@
               avgedir,avgecan,avgetrans,avgesnow,avgprec_cont,avgcprate_cont,rel_vort_max, &
               avisbeamswin,avisdiffswin,airbeamswin,airdiffswin,refdm10c_max,wspd10max, &
               alwoutc,alwtoac,aswoutc,aswtoac,alwinc,aswinc,avgpotevp,snoavg, &
-              ti,aod550,du_aod550,ss_aod550,su_aod550,oc_aod550,bc_aod550
+              ti,aod550,du_aod550,ss_aod550,su_aod550,oc_aod550,bc_aod550,prate_max
       use soil,  only: sldpth, sh2o, smc, stc
       use masks, only: lmv, lmh, htm, vtm, gdlat, gdlon, dx, dy, hbm2, sm, sice
       use physcons_post, only: grav => con_g, fv => con_fvirt, rgas => con_rd,                     &
@@ -143,7 +144,7 @@
       real dtp !physics time step
       REAL RINC(5)
 
-      REAL DUMMY(IM,JM), DUMMY2(IM,JM), FI(IM,JM,2)
+      REAL DUMMY(IM,JM)
 !jw
       integer ii,jj,js,je,iyear,imn,iday,itmp,ioutcount,istatus,       &
               I,J,L,ll,k,kf,irtn,igdout,n,Index,nframe,                &
@@ -987,7 +988,7 @@
             end if
           end do
         end do
-        print*,'sample zint= ',isa,jsa,l,zint(isa,jsa,l)
+        if(debugprint)print*,'sample zint= ',isa,jsa,l,zint(isa,jsa,l)
       end do
 
       do l=lp1,1,-1
@@ -1307,6 +1308,11 @@
 
 ! GFS does not have accumulated total, gridscale, and convective precip, will use inst precip to derive in SURFCE.f
 
+! max hourly surface precipitation rate
+      VarName='pratemax'
+      call read_netcdf_2d_scatter(me,ncid2d,1,im,jm,jsta,jsta_2l &
+       ,jend_2u,MPI_COMM_COMP,icnt,idsp,spval,VarName,prate_max)
+     if(debugprint)print*,'sample ',VarName,' = ',prate_max(isa,jsa)
 ! max hourly 1-km agl reflectivity
       VarName='refdmax'
       call read_netcdf_2d_scatter(me,ncid2d,1,im,jm,jsta,jsta_2l &
@@ -1444,14 +1450,16 @@
       enddo
 
 ! maximum snow albedo in fraction using nemsio
-      VarName='mxsalb'
+      VarName='snoalb'
+      call read_netcdf_2d_scatter(me,ncid2d,1,im,jm,jsta,jsta_2l &
+       ,jend_2u,MPI_COMM_COMP,icnt,idsp,spval,VarName,mxsnal)
 !     where(mxsnal /= spval)mxsnal=mxsnal/100. ! convert to fraction
-!$omp parallel do private(i,j)
-      do j=jsta,jend
-        do i=1,im
-          if (mxsnal(i,j) /= spval) mxsnal(i,j) = mxsnal(i,j) * 0.01
-        enddo
-      enddo
+!!$omp parallel do private(i,j)
+!      do j=jsta,jend
+!        do i=1,im
+!          if (mxsnal(i,j) /= spval) mxsnal(i,j) = mxsnal(i,j) * 0.01
+!        enddo
+!      enddo
 !     if(debugprint)print*,'sample ',VarName,' = ',mxsnal(isa,jsa)
      
 ! GFS probably does not use sigt4, set it to sig*t^4

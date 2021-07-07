@@ -28,6 +28,8 @@
 !!   20-03-25  J MENG   - remove grib1
 !!   20-05-20  J MENG   - CALRH unification with NAM scheme
 !!   20-11-10  J MENG   - USE UPP_PHYSICS MODULE
+!!   21-03-11  B Cui - change local arrays to dimension (im,jsta:jend)
+!!   21-04-01  J MENG   - COMPUTATION ON DEFINED POINTS ONLY
 !!
 !! USAGE:    CALL MDL2P
 !!   INPUT ARGUMENT LIST:
@@ -71,7 +73,8 @@
                          CNVCTUMMIXING, NCNVCTCFRAC, CNVCTUMFLX, CNVCTDETMFLX, &
                          CNVCTZGDRAG, CNVCTMGDRAG, ZMID, ZINT, PMIDV,          &
                          CNVCTDMFLX
-      use vrbls2d, only: T500, W_UP_MAX, W_DN_MAX, W_MEAN, PSLP, FIS, Z1000
+      use vrbls2d, only: T500,T700,W_UP_MAX,W_DN_MAX,W_MEAN,PSLP,FIS,Z1000,Z700,&
+                         Z500
       use masks,   only: LMH, SM
       use physcons_post,only: CON_FVIRT, CON_ROG, CON_EPS, CON_EPSM1
       use params_mod, only: H1M12, DBZMIN, H1, PQ0, A2, A3, A4, RHMIN, G,      &
@@ -334,8 +337,8 @@
                  IF(Q(I,J,1) < SPVAL)   QSL(I,J) = Q(I,J,1)
 
                  IF(gridtype == 'A')THEN
-                   USL(I,J) = UH(I,J,1)
-                   VSL(I,J) = VH(I,J,1)
+                   IF(UH(I,J,1) < SPVAL) USL(I,J) = UH(I,J,1)
+                   IF(VH(I,J,1) < SPVAL) VSL(I,J) = VH(I,J,1)
                  END IF
 
 !                if ( J == JSTA.and. I == 1.and.me == 0)    &
@@ -1016,9 +1019,24 @@
               DO J=JSTA,JEND
                 DO I=1,IM
                   T500(I,J) = TSL(I,J)
+                  Z500(I,J) = FSL(I,J)*GI
                 ENDDO
               ENDDO
             ENDIF
+
+!     
+!***     SAVE 700MB TEMPERATURE FOR LIFTED INDEX.
+!     
+            IF(NINT(SPL(LP)) == 70000)THEN
+!$omp parallel do private(i,j)
+              DO J=JSTA,JEND
+                DO I=1,IM
+                  T700(I,J) = TSL(I,J)
+                  Z700(I,J) = FSL(I,J)*GI
+                ENDDO
+              ENDDO
+            ENDIF
+
 !     
 !---------------------------------------------------------------------
 !***  CALCULATE 1000MB GEOPOTENTIALS CONSISTENT WITH SLP OBTAINED 
@@ -1105,7 +1123,7 @@
                     if(grib == 'grib2')then
                       dxm=dxm/1000.0
                     endif
-                    print *,'dxm=',dxm
+!                    print *,'dxm=',dxm
                     NSMOOTH = nint(5.*(13500./dxm))
                     call AllGETHERV(GRID1)
                     do k=1,NSMOOTH
@@ -1170,7 +1188,11 @@
 !$omp parallel do private(i,j)
             DO J=JSTA,JEND
               DO I=1,IM
+              IF(TSL(I,J) < SPVAL .AND. QSL(I,J) < SPVAL) THEN
                 GRID1(I,J) = TSL(I,J)*(1.+0.608*QSL(I,J))
+              ELSE
+                GRID1(I,J) = SPVAL
+              ENDIF
               ENDDO
             ENDDO
 
@@ -1315,6 +1337,7 @@
 !$omp  parallel do private(i,j)
             DO J=JSTA,JEND
               DO I=1,IM
+                GRID1(I,J) = SPVAL
                 CFRSL(I,J) = MIN(MAX(0.0,CFRSL(I,J)),1.0)
                 IF(abs(CFRSL(I,J)-SPVAL) > SMALL)                   &    
                       GRID1(I,J) = CFRSL(I,J)*H100
@@ -1608,7 +1631,9 @@
 !$omp  parallel do private(i,j)
             DO J=JSTA,JEND
               DO I=1,IM
+              IF(FSL(I,J)<SPVAL)THEN
                 EGRID2(I,J) = FSL(I,J)*GI
+              ENDIF
               ENDDO
             ENDDO
             CALL CALSTRM(EGRID2(1,jsta),EGRID1(1,jsta))
@@ -1671,8 +1696,12 @@
 !$omp  parallel do private(i,j)
                DO J=JSTA,JEND
                  DO I=1,IM
+                 IF(QW1(I,J) < SPVAL .AND. QI1(I,J) < SPVAL) THEN
                    GRID1(I,J) = QW1(I,J) + QI1(I,J)
                    QI1(I,J) = spval
+                 ELSE
+                   GRID1(I,J) = SPVAL
+                 ENDIF
                  ENDDO
                ENDDO
              ELSE
@@ -1927,7 +1956,11 @@
 !$omp  parallel do private(i,j)
               DO J=JSTA,JEND
                 DO I=1,IM
+                  IF(FSL(I,J)<spval)THEN
                   GRID1(I,J)  = FSL(I,J)*GI
+                  ELSE
+                  GRID1(I,J)  = SPVAL
+                  ENDIF
                   EGRID1(I,J) = SPVAL
                 ENDDO
               ENDDO
@@ -1964,7 +1997,11 @@
           DO I=1,IM
             USL_OLD(I,J) = USL(I,J)
             VSL_OLD(I,J) = VSL(I,J)
+            IF(FSL(I,J)<spval)THEN
             FSL_OLD(I,J) = FSL(I,J)*GI
+            ELSE
+            FSL_OLD(I,J) = SPVAL
+            ENDIF
           ENDDO
         ENDDO
 !
@@ -2000,7 +2037,11 @@
 !$omp  parallel do private(i,j)
              DO J=JSTA,JEND
                DO I=1,IM
+               IF(SMOKESL(I,J,1)<SPVAL.and.SPL(LP)<SPVAL.and.TSL(I,J)<SPVAL)THEN
                  GRID1(I,J) = (1./RD)*SMOKESL(I,J,1)*(SPL(LP)/TSL(I,J))
+               ELSE
+                 GRID1(I,J) = SPVAL
+               ENDIF
                ENDDO
              ENDDO
              if(grib == 'grib2')then
@@ -3513,7 +3554,11 @@
                    ELSE
                      IMOIS = 3
                    END IF
+                 IF(TSL(I,J)<spval.and.TPRS(I,J,LUHI)<spval.and.TDSL(I,J)<spval)THEN
                    HAINES(I,J) = ISTA + IMOIS
+                 ELSE
+                   HAINES(I,J) = SPVAL
+                 ENDIF
 ! 	       if(i==570 .and. j==574)print*,'high hainesindex:',i,j,luhi,tsl(i,j) &
 ! 	       ,tprs(i,j,luhi),tdsl(i,j),ista,imois,spl(luhi),spl(lp),haines(i,j)
                  END IF 
@@ -3555,7 +3600,11 @@
                  END IF
 ! 	       if(i==570 .and. j==574)print*,'mid haines index:',i,j,luhi,tsl(i,j) &
 ! 	       ,tprs(i,j,luhi),tdsl(i,j),ista,imois,spl(luhi),spl(lp),haines(i,j)
+               IF(TSL(I,J)<spval.and.TPRS(I,J,LUHI)<spval.and.TDSL(I,J)<spval)THEN
                  HAINES(I,J) = ISTA + IMOIS
+               ELSE
+                 HAINES(I,J) = SPVAL
+               ENDIF
                END IF 
              END DO
            END DO  
@@ -3595,7 +3644,11 @@
                  END IF
 ! 	       if(i==570 .and. j==574)print*,'low haines index:',i,j,luhi,tsl(i,j) &
 ! 	       ,tprs(i,j,luhi),tdsl(i,j),ista,imois,spl(luhi),spl(lp),haines(i,j)
+               IF(TSL(I,J)<spval.and.TPRS(I,J,LUHI)<spval.and.TDSL(I,J)<spval)THEN
                  HAINES(I,J) = ISTA + IMOIS
+               ELSE
+                 HAINES(I,J) = SPVAL
+               ENDIF
                END IF 
              END DO
            END DO  
@@ -3795,7 +3848,11 @@
 !$omp  parallel do private(i,j)
                  DO J=JSTA,JEND
                    DO I=1,IM
+                   IF(FSL(I,J)<SPVAL)THEN
                      GRID1(I,J) = FSL(I,J)*GI
+                   ELSE
+                     GRID1(I,J) = SPVAL
+                   ENDIF
                    ENDDO
                  ENDDO    
                ELSE
@@ -3846,6 +3903,9 @@
         ENDIF  
       ENDIF
 !
+if(allocated(d3dsl))   deallocate(d3dsl)
+if(allocated(dustsl))  deallocate(dustsl)
+if(allocated(smokesl)) deallocate(smokesl)
 !     END OF ROUTINE.
 !
       RETURN

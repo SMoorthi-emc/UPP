@@ -88,13 +88,16 @@
       real rn(im*jm*2)
       integer :: rn_seed_size
       integer, allocatable, dimension(:) :: rn_seed
+      logical, parameter :: debugprint = .false.
 !
 !     initialize weather type array to zero (ie, off).
 !     we do this since we want ptype to represent the
 !     instantaneous weather type on return.
 !     
-!     print *,'in calwxtbg, jsta,jend=',jsta,jend,' im=',im
-!     print *,'in calwxtbg,me=',me,'iseed=',iseed
+      if (debugprint) then
+        print *,'in calwxtbg, jsta,jend=',jsta,jend,' im=',im
+        print *,'in calwxtbg,me=',me,'iseed=',iseed
+      endif
 !
 !$omp  parallel do
       do j=jsta,jend
@@ -116,6 +119,7 @@
 !     &         areape,dzkl,surfw,r1,r2)
 
       do j=jsta,jend
+!       print *,'incalwxtbg, rn',maxval(rn),minval(rn)
         do i=1,im
            lmhk  = min(nint(lmh(i,j)),lm)
            psfck = pint(i,j,lmhk+1)
