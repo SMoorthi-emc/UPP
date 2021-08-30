@@ -9,13 +9,14 @@ module purge
 #
 #  Make sure the directory "CMakeModules/Modules" exists!
 #  if not do "git submodule update --init --recursive"
+#Also, on dell if compile for UFS fails, then remove reference to IP in "upp-targets.cmake"
 #
  if [ $machine = wcoss_dell_p3 ] ; then
-#  module load ips/18.0.1.163
-#  module load impi/18.0.1
-#  module load lsf/10.1
-#  module load python/3.6.3
-#  module load cmake/3.20.2
+   module load ips/18.0.1.163
+   module load impi/18.0.1
+   module load lsf/10.1
+   module load python/3.6.3
+   module load cmake/3.20.2
 
    module use /usrx/local/nceplibs/dev/hpc-stack/libs/hpc-stack/modulefiles/stack
 
@@ -23,7 +24,7 @@ module purge
    module load hpc-ips/18.0.1.163
    module load hpc-impi/18.0.1
 
-   module load cmake/3.16.2
+#  module load cmake/3.16.2
    module load jasper/2.0.22
    module load zlib/1.2.11
    module load png/1.6.35
