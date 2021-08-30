@@ -16,9 +16,10 @@ module purge
    module load lsf/10.1
    module load python/3.6.3
 
-   module use /usrx/local/nceplibs/dev/hpc-stack/test/hpc-stack/modulefiles/stack
+   module use /usrx/local/nceplibs/dev/hpc-stack/libs/hpc-stack/modulefiles/stack
 
-   module load hpc/1.0.0-beta1
+   module load hpc/1.1.0
+   module load cmake/3.20.0
    module load hpc-ips/18.0.1.163
    module load hpc-impi/18.0.1
 
@@ -30,33 +31,38 @@ module purge
    module load bacio/2.4.1
    module load crtm/2.3.0
    module load g2/3.4.1
-   module load g2tmpl/1.9.1
+   module load g2tmpl/1.10.0
    module load ip/3.3.3
    module load nemsio/2.5.2
    module load sp/2.3.3
    module load w3emc/2.7.3
    module load w3nco/2.4.1
    module load sigio/2.3.2 sfcio/1.4.1 gfsio/1.4.1
-   module load cmake/3.16.2
+   module load wrf_io/1.1.1
 
  elif [ $machine = hera.intel ] ; then
 
-   module use /scratch2/NCEPDEV/nwprod/hpc-stack/test/modulefiles/stack 
-   module load hpc/1.0.0-beta1
-   module load hpc-intel/18.0.5.274 hpc-impi/2018.0.4 jasper/2.0.22 zlib/1.2.11 png/1.6.35
+   module load cmake/3.20.1
+   module use /scratch2/NCEPDEV/nwprod/hpc-stack/libs/hpc-stack/modulefiles/stack
+   module load hpc/1.1.0
+   module load hpc-intel/18.0.5.274
+   module load hpc-impi/2018.0.4
+   module load jasper/2.0.22
+   module load zlib/1.2.11
+   module load png/1.6.35
    module load hdf5/1.10.6
    module load netcdf/4.7.4
    module load bacio/2.4.1
    module load crtm/2.3.0
    module load g2/3.4.1
-   module load g2tmpl/1.9.1
+   module load g2tmpl/1.10.0
    module load ip/3.3.3
    module load nemsio/2.5.2
    module load sp/2.3.3
    module load w3emc/2.7.3
    module load w3nco/2.4.1
    module load sigio/2.3.2 sfcio/1.4.1 gfsio/1.4.1
-   module load cmake/3.16.1
+   module load wrf_io/1.1.1
  fi
    module list
 
