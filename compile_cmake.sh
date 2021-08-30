@@ -64,6 +64,9 @@ module purge
    module load w3nco/2.4.1
    module load sigio/2.3.2 sfcio/1.4.1 gfsio/1.4.1
    module load wrf_io/1.1.1
+ else
+   echo 'unsupported machine at this time'
+   exit
  fi
    module list
 
