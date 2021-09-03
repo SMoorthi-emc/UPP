@@ -47,7 +47,7 @@
 !
       use xml_perl_data, only: param_t
       use ctlblk_mod, only: lsm, spl, nsoil, isf_surface_physics, nfd, htfd, &
-                            petabnd, nbnd
+                            petabnd, nbnd, me
       use soil,       only: SLDPTH,SLLEVEL
       use rqstfld_mod,only : mxlvl,LVLS,LVLSXML
       implicit none
@@ -159,10 +159,12 @@
            endif
          enddo iloop3
          enddo
+!        if (me == 0) then
 !        print *,'for level type pv,nlevel=',nlevel,'level=',  &
 !          param%level(1:nlevel)*10.**(-1*scalef), &
-!          'pv=',pv(1:kpv),lvls1(1:kpv),'ifld=',ifld,'var=',trim(param%pname), &
+!          'pv=',pv(1:kpv),lvls(1:kpv,1),'ifld=',ifld,'var=',trim(param%pname), &
 !          'lvl type=',trim(param%fixed_sfc1_type)
+!        endif
          return
       endif
 !
@@ -179,10 +181,12 @@
            endif
          enddo iloop3a
          enddo
+!        if (me == 0) then
 !         print *,'for level type th,nlevel=',nlevel,'level=',  &
 !           param%level(1:nlevel), &
 !           'th=',th(1:kth),'ifld=',ifld,'var=',trim(param%pname), &
 !           'lvl type=',trim(param%fixed_sfc1_type)
+!        endif
          return
       endif
 !

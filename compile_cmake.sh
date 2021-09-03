@@ -83,6 +83,7 @@ module purge
 # setenv CMAKE_Platform $machine
   
 #here is how to build post with cmake
+  rm -rf build install
   mkdir build
   cd build
   cmake .. -DBUILD_POSTEXEC=ON -DCMAKE_INSTALL_PREFIX=../install

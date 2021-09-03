@@ -308,6 +308,7 @@
 !           'lev_type=',trim(pset%param(nprm)%fixed_sfc1_type),'itblinfo=',itblinfo,      &
 !           'nlvl=',nlvl,'lvl1=',fldlvl1,'lvl2=',fldlvl2, &
 !           'shortname=',trim(pset%param(nprm)%shortname)
+
           call search_for_4dot2_entry(                                &
                                       pset%param(nprm)%pname,         &
                                       itblinfo,                       &
@@ -547,7 +548,7 @@
     integer gefs1,gefs2,gefs3,gefs_status
     character(len=4) cdum
     integer perturb_num,num_ens_fcst,e1_type
-    real    fmin, fmax
+!   real    fmin, fmax
 !
 !----------------------------------------------------------------------------------------
 ! Find out if the Post is being run for the GEFS model

@@ -155,7 +155,7 @@ list(APPEND EXE_SRC
     WRFPOST.f
     getIVariableN.f
     getVariable.f
-    getlvls.f
+#   getlvls.f
     intio_tags.f
     retrieve_index.f
     wrf_io_flags.f

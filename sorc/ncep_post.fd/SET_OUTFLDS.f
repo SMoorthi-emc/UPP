@@ -57,7 +57,7 @@
 !     DECLARE VARIABLES.
 !     
       integer, intent(in) :: KTH,KPV
-      real, intent(in)    :: th(kth),pv(kpv)
+      real,    intent(in) :: th(kth),pv(kpv)
 !
       integer L,IFLD,MFLD,IAVBL,IREC,I,J
       CHARACTER*50 AVBLGRB_NAME
@@ -94,7 +94,7 @@
 !
       pset   = paramset(npset)
       datset = pset%datset
-      if (me==0)print *,'in SET_OUTFLDS, num_pset=',num_pset,'datset=',trim(pset%datset),'npset=',npset
+!     if (me==0)print *,'in SET_OUTFLDS, num_pset=',num_pset,'datset=',trim(pset%datset),'npset=',npset
 ! 
 !     NOW READ WHICH FIELDS ON 
 !     WHICH LEVELS TO INTERPOLATE TO THE OUTPUT GRID.  THE
@@ -122,6 +122,7 @@
 !
       IFLD = 0
       irec = 0
+!     if (me == 0) write(0,*)' mfld=',mfld, ' kth=',kth, ' th=',th(1:kth),' kpv=',kpv,' pv=',pv(1:kpv)
       DO I=1, MFLD
          
 !     SEE IF REQUESTED FIELD IS AVAILABLE.  IF NOT, 
@@ -147,6 +148,8 @@
          FOUND_FLD      = .true.
          call set_lvlsxml(pset%param(i),ifld,irec,kpv,pv,kth,th)
 
+!     if (me == 0) write(0,*)' ifld=',ifld,' iavbl=',iavbl,' kpv=',kpv,' kth=',kth,&
+!    ' th=',th(1:kth),' pv=',pv(1:kpv)
       ENDDO
 
 !     

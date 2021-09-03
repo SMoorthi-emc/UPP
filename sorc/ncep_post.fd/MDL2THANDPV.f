@@ -98,6 +98,7 @@
 !     VERTICAL INTERPOLATION OF EVERYTHING ELSE.  EXECUTE ONLY
 !     IF THERE'S SOMETHING WE WANT.
 !
+!     if (me == 0) write(0,*)' in MDL2THANDPV IGET=',IGET(332:358)
       IF((IGET(332) > 0).OR.(IGET(333) > 0).OR.     &
          (IGET(334) > 0).OR.(IGET(335) > 0).OR.     &
          (IGET(336) > 0).OR.(IGET(337) > 0).OR.     &
@@ -390,6 +391,7 @@
                          ,SIGMATH(I,J,1:KTH),RHTH(I,J,1:KTH)            &
                          ,OTH(I,J,1:KTH))!output
               END IF
+!     if (me == 0 .and. j == jsta .and. i== 1) write(0,*)' in MDL2THANDPV bef call to p2pv'
 ! interpolate to PV levels
               IF((IGET(336) > 0).OR.(IGET(337) > 0).OR.  &
                  (IGET(338) > 0).OR.(IGET(339) > 0).OR.  &
@@ -399,6 +401,7 @@
                          ,LPV,UPV(I,J,1:KPV),VPV(I,J,1:KPV),HPV(I,J,1:KPV)         &
 !output
                          ,TPV(I,J,1:KPV),PPV(I,J,1:KPV),SPV(I,J,1:KPV) )   !output
+!     if (me == 0 .and. j == jsta .and. i== 1) write(0,*)' in MDL2THANDPV aft call to p2pv'
               END IF
 
             END DO
@@ -656,6 +659,7 @@
         END IF ! for different grids
 
 
+!     if (me == 0 )write(0,*)' in MDL2THANDPV af P2PV,tpv=',maxval(TPV(1,jsta,1:KPV))
 !             print *,'in mdlthpv,af P2PV,tpv=',maxval(TPV(I,J,1:KPV)),  &
 !           minval(TPV(I,J,1:KPV)),'kpv=',kpv,'zmid=',maxval(ZMID(1:im,jsta:jend,1:LM)),  &
 !           minval(ZMID(1:im,jsta:jend,1:LM)),'uth=',maxval(uth(1:im,jsta:jend,1:kth)),  &
@@ -670,6 +674,8 @@
         DO LP=1,KTH
 !***  ISENTROPIC U AND/OR V WIND
 !
+!     if (me == 0 ) write(0,*) ' in MDL2THANDPV LP= ',lp,' iget=',IGET(332:333), &
+!       ' lvls=',LVLS(LP,IGET(332)), LVLS(LP,IGET(333))
 
          IF(IGET(332) > 0 .OR. IGET(333) > 0)THEN
            IF(LVLS(LP,IGET(332)) > 0 .OR. LVLS(LP,IGET(333)) > 0)THEN
@@ -707,6 +713,7 @@
 
 !***  OUTPUT ISENTROPIC T
 !
+!     if (me == 0 )write(0,*) ' in MDL2THANDPV LP= ',lp,' iget=',IGET(334),' lvls=',LVLS(LP,IGET(334))
         IF(IGET(334) > 0)THEN
           IF(LVLS(LP,IGET(334)) > 0)THEN
 !!$omp  parallel do
