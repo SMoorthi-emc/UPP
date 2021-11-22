@@ -3870,6 +3870,8 @@
                      ENDIF
                      Z1000(I,J) = GRID1(I,J)*GI
                      GRID1(I,J) = Z1000(I,J)
+                    ELSE
+                     GRID1(I,J) = SPVAL
                     END IF
                    ENDDO
                  ENDDO    

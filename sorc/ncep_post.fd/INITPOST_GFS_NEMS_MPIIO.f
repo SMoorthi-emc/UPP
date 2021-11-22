@@ -94,7 +94,6 @@
               iSF_SURFACE_PHYSICS, mp_physics
       use gridspec_mod, only: maptype, gridtype, latstart, latlast, lonstart, lonlast, cenlon,  &
               dxval, dyval, truelat2, truelat1, psmapf, cenlat
-      use rqstfld_mod,  only: igds, avbl, iq, is
       use nemsio_module_mpi
       use upp_physics, only: fpvsnew
 !- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
