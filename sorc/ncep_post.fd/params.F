@@ -113,5 +113,5 @@ module params_mod
 !
     real, parameter :: GAMMA=6.5E-3
     real, parameter :: RGAMOG=RD*GAMMA/G
-
+    real, parameter :: min_seaice=1.0e-6
 end module params_mod

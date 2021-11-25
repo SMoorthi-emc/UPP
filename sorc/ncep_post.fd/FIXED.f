@@ -47,7 +47,7 @@
       use vrbls3d, only: pint
       use vrbls2d, only: albedo, avgalbedo, albase, mxsnal, sst, ths, epsr, ti
       use masks, only: gdlat, gdlon, sm, sice, lmh, lmv
-      use params_mod, only: small, p1000, capa
+      use params_mod, only: small, p1000, capa, min_seaice
       use lookup_mod, only: ITB,JTB,ITBQ,JTBQ
       use ctlblk_mod, only: jsta, jend, modelname, grib, cfld, fld_info, datapd, spval, tsrfc,&
               ifhr, ifmin, lm, im, jm
@@ -109,7 +109,7 @@
            DO I = 1,IM
              GRID1(I,J) = SPVAL
               IF(SM(I,J)   /= SPVAL) GRID1(I,J) = 1. - SM(I,J)
-              IF(SICE(I,J) /= SPVAL .AND. SICE(I,J) > 0.1) GRID1(I,J) = 0.
+              IF(SICE(I,J) /= SPVAL .AND. SICE(I,J) >= min_seaice) GRID1(I,J) = 0.
 !           if(j==jm/2)print*,'i,mask= ',i,grid1(i,j)
            ENDDO
          ENDDO
