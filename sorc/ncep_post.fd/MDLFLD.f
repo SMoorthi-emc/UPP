@@ -331,7 +331,7 @@
                    FCTR = 0.
                    LLMH = NINT(LMH(I,J)) 
                    Lctop=NINT(HTOP(I,J))              !--- Cu cld top level
-                   IF (L.GE.Lctop .AND. L.LE.LLMH) THEN
+                   IF (L >= Lctop .AND. L <= LLMH) THEN
                       DELZ=ZMID(I,J,L)-Zfrz(I,J)
                       IF (DELZ <= 0.) THEN
                          FCTR = 1.        !-- Below the highest freezing level
@@ -340,10 +340,10 @@
        !--- Reduce convective radar reflectivity above freezing level
        !
                          FCTR=10.**(CUREFL_I(I,J)*DELZ)
-                      ENDIF             !-- End IF (DELZ .LE. 0.)
-                   ENDIF                !-- End IF (L.GE.HTOP(I,J) .OR. L.LE.LLMH)
+                      ENDIF             !-- End IF (DELZ <=. 0.)
+                   ENDIF                !-- End IF (L >= HTOP(I,J) .OR. L <= LLMH)
                    CUREFL(I,J)=FCTR*CUREFL_S(I,J)
-                ENDIF                   !-- End IF (CUREFL_S(I,J) .GT. 0.)
+                ENDIF                   !-- End IF (CUREFL_S(I,J) > 0.)
 
               ENDDO         !-- End DO I loop
             ENDDO         !-- End DO J loop 
@@ -369,39 +369,44 @@ refl_miss:        IF (Model_Radar) THEN
                 ! - Model output DBZ is present - proceed with calc
                     DO J=JSTA,JEND
                       DO I=1,IM
-                        ze_nc      = 10.**(0.1*REF_10CM(I,J,L))
-                        DBZ1(I,J)  = 10.*LOG10(max(Zmin,(ze_nc+CUREFL(I,J))))
-                        DBZR1(I,J) = MIN(DBZR1(I,J), REF_10CM(I,J,L))
-                        DBZI1(I,J) = MIN(DBZI1(I,J), REF_10CM(I,J,L))
-                        ze_max     = MAX(DBZR1(I,J),DBZI1(I,J))
-refl_comp:              IF(REF_10CM(I,J,L) > DBZmin .OR. ze_max > DBZmin) THEN
-refl_adj:                 IF(REF_10CM(I,J,L) <= DBZmin) THEN
-                            DBZR1(I,J) = DBZmin
-                            DBZI1(I,J) = DBZmin
-                          ELSE IF(ze_max <= DBZmin) THEN
-                            IF(QR1(I,J) > QS1(I,J)) THEN
-                              DBZR1(I,J) = REF_10CM(I,J,L)
-                            ELSE IF(QS1(I,J) > QR1(I,J)) THEN
-                              DBZI1(I,J) = REF_10CM(I,J,L)
-                            ELSE
-                              IF(T1D(I,J) >= TFRZ) THEN
+                        IF(P1D(I,J) < spval .and. T1D(I,J) < spval .and. Q1D(I,J) < spval) THEN
+                          ze_nc      = 10.**(0.1*REF_10CM(I,J,L))
+                          DBZ1(I,J)  = 10.*LOG10(max(Zmin,(ze_nc+CUREFL(I,J))))
+                          DBZR1(I,J) = MIN(DBZR1(I,J), REF_10CM(I,J,L))
+                          DBZI1(I,J) = MIN(DBZI1(I,J), REF_10CM(I,J,L))
+                          ze_max     = MAX(DBZR1(I,J),DBZI1(I,J))
+refl_comp:                IF(REF_10CM(I,J,L) > DBZmin .OR. ze_max > DBZmin) THEN
+refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
+                              DBZR1(I,J) = DBZmin
+                              DBZI1(I,J) = DBZmin
+                            ELSE IF(ze_max <= DBZmin) THEN
+                              IF(QR1(I,J) > QS1(I,J)) THEN
                                 DBZR1(I,J) = REF_10CM(I,J,L)
+                              ELSE IF(QS1(I,J) > QR1(I,J)) THEN
+                                DBZI1(I,J) = REF_10CM(I,J,L)
                               ELSE
-                                DBZI1(I,J)=REF_10CM(I,J,L)
+                                IF(T1D(I,J) >= TFRZ) THEN
+                                  DBZR1(I,J) = REF_10CM(I,J,L)
+                                ELSE
+                                  DBZI1(I,J)=REF_10CM(I,J,L)
+                                ENDIF
                               ENDIF
-                            ENDIF
-                          ELSE 
-                            ze_nc  = 10.**(0.1*REF_10CM(I,J,L))
-                            ze_r   = 10.**(0.1*DBZR1(I,J))
-                            ze_s   = 10.**(0.1*DBZI1(I,J))
-                            ze_sum = ze_r+ze_s
-                            ze_max = ze_nc/ze_sum
-                            ze_r   = ze_r*ze_max
-                            ze_s   = ze_s*ze_max
-                            DBZR1(I,J) = 10.*LOG10(ze_r)
-                            DBZI1(I,J) = 10.*LOG10(ze_s)
-                          ENDIF  refl_adj
-                        ENDIF    refl_comp
+                            ELSE 
+                              ze_nc  = 10.**(0.1*REF_10CM(I,J,L))
+                              ze_r   = 10.**(0.1*DBZR1(I,J))
+                              ze_s   = 10.**(0.1*DBZI1(I,J))
+                              ze_sum = ze_r+ze_s
+                              ze_max = ze_nc/ze_sum
+                              ze_r   = ze_r*ze_max
+                              ze_s   = ze_s*ze_max
+                              DBZR1(I,J) = 10.*LOG10(ze_r)
+                              DBZI1(I,J) = 10.*LOG10(ze_s)
+                            ENDIF  refl_adj
+                          ENDIF    refl_comp
+                        ELSE
+                          DBZR1(I,J) = DBZmin
+                          DBZI1(I,J) = DBZmin
+                        ENDIF
                       ENDDO
                     ENDDO
                   ELSE
@@ -471,7 +476,7 @@ refl_adj:                 IF(REF_10CM(I,J,L) <= DBZmin) THEN
                   DBZC(I,J,L)  = MAX(DBZmin, DBZC1(I,J))
                   NLICE(I,J,L) = MAX(D00, NLICE1(I,J))
                   NRAIN(I,J,L) = MAX(D00, NRAIN1(I,J))
-                ENDIF       !-- End IF (L .GT. LMH(I,J)) ...
+                ENDIF       !-- End IF (L > LMH(I,J)) ...
               ENDDO         !-- End DO I loop
             ENDDO           !-- End DO J loop
                                         
@@ -512,7 +517,7 @@ refl_adj:                 IF(REF_10CM(I,J,L) <= DBZmin) THEN
                 DBZR(I,J,L) = DBZmin
                 DBZI(I,J,L) = DBZmin
                 DBZC(I,J,L) = DBZmin
-              ENDIF       !-- End IF (L .GT. LMH(I,J)) ...
+              ENDIF       !-- End IF (L > LMH(I,J)) ...
             ENDDO         !-- End DO I loop
           ENDDO  ! END DO L LOOP
         ENDDO
@@ -547,7 +552,7 @@ refl_adj:                 IF(REF_10CM(I,J,L) <= DBZmin) THEN
                 DBZR(I,J,L) = MAX(DBZmin, DBZR(I,J,L))
                 DBZI(I,J,L) = MAX(DBZmin, DBZI(I,J,L))
     
-              ENDIF       !-- End IF (L .GT. LMH(I,J)) ...
+              ENDIF       !-- End IF (L > LMH(I,J)) ...
             ENDDO         !-- End DO I loop
           ENDDO
         ENDDO  
@@ -557,7 +562,7 @@ refl_adj:                 IF(REF_10CM(I,J,L) <= DBZmin) THEN
         DO L=1,LM
           DO J=JSTA,JEND
             DO I=1,IM
-              DBZ(I,J,L)=REF_10CM(I,J,L)
+              DBZ(I,J,L) = REF_10CM(I,J,L)
             ENDDO
           ENDDO
         ENDDO
@@ -565,7 +570,7 @@ refl_adj:                 IF(REF_10CM(I,J,L) <= DBZmin) THEN
         DO L=1,LM
           DO J=JSTA,JEND
             DO I=1,IM
-              DBZ(I,J,L)=SPVAL
+              DBZ(I,J,L) = SPVAL
             ENDDO
           ENDDO
         ENDDO
@@ -583,7 +588,7 @@ refl_adj:                 IF(REF_10CM(I,J,L) <= DBZmin) THEN
         RDTPHS=3.6E6/DTQ2
         DO J=JSTA,JEND
          DO I=1,IM
-          CUPRATE=RDTPHS*CPRATE(I,J)            !--- Cu precip rate, R (mm/h)
+          CUPRATE=RDTPHS*CPRATE(I,J)          !--- Cu precip rate, R (mm/h)
           Zfrz(I,J)=ZMID(I,J,NINT(LMH(I,J)))  !-- Initialize to lowest model level
           DO L=1,NINT(LMH(I,J))               !-- Start from the top, work down
              IF (T(I,J,L) >= TFRZ) THEN

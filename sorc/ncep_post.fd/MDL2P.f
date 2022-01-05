@@ -182,7 +182,7 @@
           enddo
         enddo
       enddo
-      id(:) = -1
+!     id(:) = -1
 !     
 !     SET TOTAL NUMBER OF POINTS ON OUTPUT GRID.
 !

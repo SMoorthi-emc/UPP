@@ -163,8 +163,8 @@
       logical, parameter :: debugprint = .false.
 
 
-      real (kind=8) :: wrk(1)
-      integer       :: iseed0
+!     real (kind=8) :: wrk(1)
+!     integer       :: iseed0
 
 !****************************************************************************
 !

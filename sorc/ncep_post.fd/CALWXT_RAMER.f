@@ -110,7 +110,7 @@
           xxx = tdofesat(xxx,flag,flg)
           twq(I,J,L) = xmytw_post(tq(I,J,L),xxx,pq(I,J,L))
 
-!         IF(I .EQ. 324 .and. J .EQ. 390) THEN
+!         IF(I == 324 .and. J == 390) THEN
 !           print *, 'tw ramer ', L, Twq(I,J,L),'me=',me
 !         ENDIF
           IF (trace) WRITE (*,*) 'Twq(I,J,L),L ', twq(I,J,L), L,'me=',me

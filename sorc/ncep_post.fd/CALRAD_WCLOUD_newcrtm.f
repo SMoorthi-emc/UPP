@@ -1043,23 +1043,23 @@
 
                              atmosphere(1)%cloud(1)%effective_radius(k) = effr(pmid(i,j,k),t(i,j,k),   &
                                q(i,j,k),qqw(i,j,k),qqi(i,j,k),qqr(i,j,k),f_rimef(i,j,k),nlice(i,j,k),  &
-                               nrain(i,j,k),qqs(i,j,k),qqg(i,j,k),qqnr(i,j,k),qqni(i,j,k),imp_physics,'C')
+                               nrain(i,j,k),qqs(i,j,k),qqg(i,j,k),qqnr(i,j,k),qqni(i,j,k),qqnw(i,j,k),imp_physics,'C')
 
                              atmosphere(1)%cloud(2)%effective_radius(k) = effr(pmid(i,j,k),t(i,j,k),   &
                                q(i,j,k),qqw(i,j,k),qqi(i,j,k),qqr(i,j,k),f_rimef(i,j,k),nlice(i,j,k),  &
-                               nrain(i,j,k),qqs(i,j,k),qqg(i,j,k),qqnr(i,j,k),qqni(i,j,k),imp_physics,'I')
+                               nrain(i,j,k),qqs(i,j,k),qqg(i,j,k),qqnr(i,j,k),qqni(i,j,k),qqnw(i,j,k),imp_physics,'I')
 
                              atmosphere(1)%cloud(3)%effective_radius(k) = effr(pmid(i,j,k),t(i,j,k),   &
                                q(i,j,k),qqw(i,j,k),qqi(i,j,k),qqr(i,j,k),f_rimef(i,j,k),nlice(i,j,k),  &
-                               nrain(i,j,k),qqs(i,j,k),qqg(i,j,k),qqnr(i,j,k),qqni(i,j,k),imp_physics,'R')
+                               nrain(i,j,k),qqs(i,j,k),qqg(i,j,k),qqnr(i,j,k),qqni(i,j,k),qqnw(i,j,k),imp_physics,'R')
 
                              atmosphere(1)%cloud(4)%effective_radius(k) = effr(pmid(i,j,k),t(i,j,k),   &
                                q(i,j,k),qqw(i,j,k),qqi(i,j,k),qqr(i,j,k),f_rimef(i,j,k),nlice(i,j,k),  &
-                               nrain(i,j,k),qqs(i,j,k),qqg(i,j,k),qqnr(i,j,k),qqni(i,j,k),imp_physics,'S')
+                               nrain(i,j,k),qqs(i,j,k),qqg(i,j,k),qqnr(i,j,k),qqni(i,j,k),qqnw(i,j,k),imp_physics,'S')
 
                              atmosphere(1)%cloud(5)%effective_radius(k) = effr(pmid(i,j,k),t(i,j,k),   &
                                q(i,j,k),qqw(i,j,k),qqi(i,j,k),qqr(i,j,k),f_rimef(i,j,k),nlice(i,j,k),  &
-                               nrain(i,j,k),qqs(i,j,k),qqg(i,j,k),qqnr(i,j,k),qqni(i,j,k),imp_physics,'G')
+                               nrain(i,j,k),qqs(i,j,k),qqg(i,j,k),qqnr(i,j,k),qqni(i,j,k),qqnw(i,j,k),imp_physics,'G')
                           end if 
                        enddo
 !Meng 09/2018 modify two model layer having identical pressure
@@ -1632,23 +1632,23 @@
 
                              atmosphere(1)%cloud(1)%effective_radius(k) = effr(pmid(i,j,k),t(i,j,k),  &
                                q(i,j,k),qqw(i,j,k),qqi(i,j,k),qqr(i,j,k),f_rimef(i,j,k),nlice(i,j,k), &
-                               nrain(i,j,k),qqs(i,j,k),qqg(i,j,k),qqnr(i,j,k),qqni(i,j,k),imp_physics,'C')
+                               nrain(i,j,k),qqs(i,j,k),qqg(i,j,k),qqnr(i,j,k),qqni(i,j,k),qqnw(i,j,k),imp_physics,'C')
 
                              atmosphere(1)%cloud(2)%effective_radius(k) = effr(pmid(i,j,k),t(i,j,k),  &
                                q(i,j,k),qqw(i,j,k),qqi(i,j,k),qqr(i,j,k),f_rimef(i,j,k),nlice(i,j,k), &
-                               nrain(i,j,k),qqs(i,j,k),qqg(i,j,k),qqnr(i,j,k),qqni(i,j,k),imp_physics,'I')
+                               nrain(i,j,k),qqs(i,j,k),qqg(i,j,k),qqnr(i,j,k),qqni(i,j,k),qqnw(i,j,k),imp_physics,'I')
 
                              atmosphere(1)%cloud(3)%effective_radius(k) = effr(pmid(i,j,k),t(i,j,k),  &
                                q(i,j,k),qqw(i,j,k),qqi(i,j,k),qqr(i,j,k),f_rimef(i,j,k),nlice(i,j,k), &
-                               nrain(i,j,k),qqs(i,j,k),qqg(i,j,k),qqnr(i,j,k),qqni(i,j,k),imp_physics,'R')
+                               nrain(i,j,k),qqs(i,j,k),qqg(i,j,k),qqnr(i,j,k),qqni(i,j,k),qqnw(i,j,k),imp_physics,'R')
 
                              atmosphere(1)%cloud(4)%effective_radius(k) = effr(pmid(i,j,k),t(i,j,k),  &
                                q(i,j,k),qqw(i,j,k),qqi(i,j,k),qqr(i,j,k),f_rimef(i,j,k),nlice(i,j,k), &
-                               nrain(i,j,k),qqs(i,j,k),qqg(i,j,k),qqnr(i,j,k),qqni(i,j,k),imp_physics,'S')
+                               nrain(i,j,k),qqs(i,j,k),qqg(i,j,k),qqnr(i,j,k),qqni(i,j,k),qqnw(i,j,k),imp_physics,'S')
 
                              atmosphere(1)%cloud(5)%effective_radius(k) = effr(pmid(i,j,k),t(i,j,k),  &
                                q(i,j,k),qqw(i,j,k),qqi(i,j,k),qqr(i,j,k),f_rimef(i,j,k),nlice(i,j,k), &
-                               nrain(i,j,k),qqs(i,j,k),qqg(i,j,k),qqnr(i,j,k),qqni(i,j,k),imp_physics,'G')
+                               nrain(i,j,k),qqs(i,j,k),qqg(i,j,k),qqnr(i,j,k),qqni(i,j,k),qqnw(i,j,k),imp_physics,'G')
                           endif 
                        enddo
 !Meng 09/2018 modify two model layer having identical pressure
@@ -2155,7 +2155,7 @@ REAL FUNCTION EFFR(pmid,t,q,qqw,qqi,qqr,f_rimef, nlice, nrain, &
         character(LEN=1) :: species
 
         integer                         :: n,count,count1,mp_opt
-        real :: rho, ncc, rhox
+        real :: rho, rhox
         real :: n0_s, n0_r, n0_g
         real :: lambdar, lambdas, lambdag
 
@@ -2398,13 +2398,7 @@ REAL FUNCTION EFFR(pmid,t,q,qqw,qqi,qqr,f_rimef, nlice, nrain, &
 
      END SELECT
 
- elseif(mp_opt == 8 .or. mp_opt == 10) then
-
-!-----------------------------------
-        ! CLOUD DROPLET NUMBER CONCENTRATION
-!-----------------------------------
- 
-          ncc = nthom_nt_c
+ elseif(mp_opt == 8 .or. mp_opt == 10 .or. mp_opt==28) then
 
 !  rain section
 

@@ -66,7 +66,7 @@ contains
     call calc_totalWaterPath(hgt, pres, t, totalWater, nz, twp)
 
 
-    pc = getPrecipCond(nz, topoK, totalCond)
+    pc = getPrecipCond(totalCond, nz, topoK)
 
     ! indice for convective icing severity
     call calc_indice(t, td, pres, wvm, nz, topoK, kx, lx, tott)
@@ -212,7 +212,7 @@ contains
 
 !-----------------------------------------------------------------------+
 ! Precipitation Condensate in g/kg
-  real function getPrecipCond(nz, topoK, totalCond)
+  real function getPrecipCond(totalCond, nz, topoK)
     IMPLICIT NONE
     integer, intent(in) :: nz, topoK
     real,    intent(in) :: totalCond(nz)
