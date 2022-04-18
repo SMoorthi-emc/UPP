@@ -1,7 +1,7 @@
 !> @file
 !
 !> SUBPROGRAM:    MDLFLD      SLP AND NATIVE LEVEL POSTING
-!!   PRGRMMR: TREADON         ORG: W/NP2      DATE: 92-12-21
+!!   PRGRMMR: TREADON         ORG: W/NP2      DATE: 92-12-21       
 !!     
 !! ABSTRACT:
 !!     THIS ROUTINE DOES SEVERAL THINGS.  IT IS THE FIRST 
@@ -24,7 +24,7 @@
 !!   00-01-04  JIM TUCCILLO - MPI VERSION
 !!   01-10-22  H CHUANG - MODIFIED TO PROCESS HYBRID MODEL OUTPUT
 !!   02-01-15  MIKE BALDWIN - WRF VERSION
-!!   04-11-17  H CHUANG, B FERRIER, AND Y JIN - ADD HYDROMETEORS,
+!!   04-11-17  H CHUANG, B FERRIER, AND Y JIN - ADD HYDROMETEORS, 
 !!					VISIBILITY & RADAR REFLECTIVITY
 !!   05-07-07  B ZHOU ADD RSM MODEL A GRID     
 !!   05-08-18  B ZHOU ADD /VISB/ COMMON BLOCK TO PASS VISIBILITY TO
@@ -52,7 +52,7 @@
 !!
 !!   OUTPUT FILES:
 !!     NONE
-!!
+!!     
 !!   SUBPROGRAMS CALLED:
 !!     UTILITIES:
 !!       BOUND    - BOUND ARRAY ELEMENTS BETWEEN LOWER AND UPPER LIMITS.
@@ -72,13 +72,13 @@
 !!       COMMON   - 
 !!                  RQSTFLD
 !!                  CTLBLK
-!!
+!!     
 !!   ATTRIBUTES:
 !!     LANGUAGE: FORTRAN
 !!     MACHINE : CRAY C-90
 !!
       SUBROUTINE MDLFLD
-!
+!    
       use vrbls4d, only: dust, salt, suso, waso, soot, smoke
       use vrbls3d, only: zmid, t, pmid, q, cwm, f_ice, f_rain, f_rimef, qqw, qqi,&
               qqr, qqs, cfr, cfr_raw, dbz, dbzr, dbzi, dbzc, qqw, nlice, nrain, qqg, zint, qqni,&
@@ -102,7 +102,7 @@
       use upp_physics, only: CALRH, CALCAPE
       use upp_math, only: H2U, H2V, U2H, V2H
 
-!
+!     
 !- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
        implicit none
 !
@@ -121,9 +121,9 @@
       DATA PPT/  0., .14, .31, .70, 1.6, 3.4, 7.7, 17., 38., 85. /
       INTEGER, dimension(im,jsta_2l:jend_2u) ::  ICBOT, ICTOP, LPBL
 
-!
+!     
 !     DECLARE VARIABLES.
-!
+!     
 !     LOGICAL NORTH,NEED(IM,JM), NMM_GFSmicro
       LOGICAL NMM_GFSmicro
       LOGiCAL Model_Radar
@@ -139,7 +139,7 @@
                                              QG1,    refl1km, refl4km, RH, GUST, NRAIN1,Zm10c
 !                                            T700,   TH700   
 !
-      REAL, ALLOCATABLE :: AFEL(:,:,:), RICHNO(:,:,:), PBLRI(:,:), PBLREGIME(:,:)
+      REAL, ALLOCATABLE :: EL(:,:,:),RICHNO(:,:,:) ,PBLRI(:,:),  PBLREGIME(:,:)
 !
       integer I,J,L,Lctop,LLMH,IICE,LL,II,JJ,IFINCR,ITHEAT,NC,NMOD,LLL  &
              ,iz1km,iz4km, LCOUNT, HCOUNT, ITYPE, item
@@ -174,8 +174,8 @@
       EXPINV = 1./EXPo
 
       Zmin   = 10.**(0.1*DBZmin)
-!
-!
+! 
+!     
 !*****************************************************************************
 !     START SUBROUTINE MDLFLD.
 !
@@ -196,10 +196,10 @@
       ENDDO check_ref
       if(debugprint .and. me==0)print*,'Did post read in model derived radar ref ',Model_Radar, &
         'MODELNAME=',trim(MODELNAME),' imp_physics=',imp_physics 
-!     ALLOCATE(EL     (IM,JSTA_2L:JEND_2U,LM))     
-!     ALLOCATE(RICHNO (IM,JSTA_2L:JEND_2U,LM))
+      ALLOCATE(EL     (IM,JSTA_2L:JEND_2U,LM))     
+      ALLOCATE(RICHNO (IM,JSTA_2L:JEND_2U,LM))
       ALLOCATE(PBLRI  (IM,JSTA_2L:JEND_2U))    
-!
+!     
 !     SECOND, STANDARD NGM SEA LEVEL PRESSURE.
       IF (IGET(105) > 0 .OR. IGET(445) > 0) THEN
         CALL NGMSLP   ! this value is used in some later calculation.
@@ -222,7 +222,7 @@
              enddo
            enddo
          endif
- 
+        
       ENDIF
 !
 !--- Calculate convective cloud fractions following radiation in
@@ -305,7 +305,7 @@
               CUREFL_I(I,J) = -2./MAX( 1000., ZMID(I,J,Lctop)-Zfrz(I,J) )
             ENDIF       !--- IF (CUPRATE <= 0. .OR. CUPPT(I,J) <= 0.) THEN
           ENDDO         !--- End DO I
-        ENDDO
+        ENDDO    
 
 !
 !--- Calculate each hydrometeor category & GRID-SCALE cloud fraction
@@ -480,16 +480,16 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
               ENDDO         !-- End DO I loop
             ENDDO           !-- End DO J loop
                                         
-          ENDDO             !-- End DO L loop
+          ENDDO             !-- End DO L loop        
         ENDIF  ! end of icount_calmict
 
         icount_calmict = icount_calmict + 1
         if(debugprint .and. me==0)print*,'debug calmict:icount_calmict= ',icount_calmict
        
-! Chuang: add the option to compute individual microphysics species
-! for NMMB+Zhao and NMMB+WSM6 which are two of SREF members.
-! Per communication with Ferrier (July 2012), he has set up these
-! 2 runs to output CWM plus fraction arrays instead of individual
+! Chuang: add the option to compute individual microphysics species 
+! for NMMB+Zhao and NMMB+WSM6 which are two of SREF members. 
+! Per communication with Ferrier (July 2012), he has set up these 
+! 2 runs to output CWM plus fraction arrays instead of individual 
 ! microphysics species arrays.
 ! WRF NMM + non Ferrier still outputs individual microphysics 
 ! arrays so these 2 if branches are excuted for NMMB only.
@@ -551,7 +551,7 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
                 DBZ(I,J,L)  = MAX(DBZmin, DBZ(I,J,L))
                 DBZR(I,J,L) = MAX(DBZmin, DBZR(I,J,L))
                 DBZI(I,J,L) = MAX(DBZmin, DBZI(I,J,L))
-
+    
               ENDIF       !-- End IF (L > LMH(I,J)) ...
             ENDDO         !-- End DO I loop
           ENDDO
@@ -765,7 +765,7 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
 
 !   -- rain
               ze_r = 1.e-35
-              if (qqr(i,j,ll) >=  1.e-6) then
+              if (qqr(i,j,ll) >=  1.e-6) then        
               rain = max(r1,qqr(i,j,ll))
               ronv = (const1r*tanh((qr0 - rain)/delqr0) +        &
                const2r)/ron
@@ -775,7 +775,7 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
 
 !   -- snow
               ze_s = 1.e-35
-              if (qqs(i,j,ll) >= 1.e-6) then
+              if (qqs(i,j,ll) >= 1.e-6) then        
               snow = max(r1,qqs(i,j,ll))
 !             New SONV formulation based on Fig. 7, curve_3 of Houze et al 1979
               rhoqs=RHOd*snow
@@ -789,7 +789,7 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
 !              which is ratio of dielectric factors for water/ice (.930/.176)
               IF (T(i,j,ll) > 273.15)                         &
                ze_s = ze_s*(1. + 4.28*bb)
-              endif
+              endif 
 
 !   -- graupel
               ze_g = 1.e-35
@@ -878,12 +878,13 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
       ENDIF     !tgs endif for Thompson scheme
 
       END IF
-!
+!     
 !     OUTPUT/CALCULATE PRESSURE, OMEGA, POTENTIAL TEMPERATURE,
 !     DEWPOINT TEMPERATURE, RELATIVE HUMIDITY, AND 
 !     ABSOLUTE VORTICITY ON MDL SURFACES.
+!     
 !
-!
+      allocate (RH3D(im,jsta_2l:jend_2u,lm))
       IF ( (IGET(001)>0).OR.(IGET(077)>0).OR.      &
            (IGET(002)>0).OR.(IGET(003)>0).OR.      &
            (IGET(004)>0).OR.(IGET(005)>0).OR.      &
@@ -937,7 +938,7 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
                 endif
                ENDIF
             ENDIF
-!
+!     
 !
 !---  CLOUD WATER on MDL SURFACE  (Jin, '01; Ferrier, Feb '02)
 !
@@ -1403,7 +1404,7 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
             ENDIF
 
           ENDIF
-!
+!	  
 !           HEIGHTS ON MDL SURFACES.
             IF (IGET(077)>0) THEN
              IF (LVLS(L,IGET(077))>0) THEN
@@ -1429,7 +1430,7 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
              ENDIF
 
             ENDIF
-!
+!     
 !           TEMPERATURE ON MDL SURFACES.
             IF (IGET(002)>0) THEN
               IF (LVLS(L,IGET(002))>0) THEN
@@ -1479,7 +1480,7 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
               ENDIF
 
             ENDIF
-!
+!     
 !           POTENTIAL TEMPERATURE ON MDL SURFACES.
             IF (IGET(003)>0) THEN
               IF (LVLS(L,IGET(003))>0) THEN
@@ -1514,7 +1515,7 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
 !
              ENDIF
             ENDIF
-!
+!     
 !           VIRTUAL POTENTIAL TEMPERATURE ON MDL SURFACES.
             IF (IGET(751)>0) THEN
              IF (LVLS(L,IGET(751))>0) THEN
@@ -1568,9 +1569,8 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
                 ENDDO
               ENDDO
 
-              CALL CALRH(P1D(1,jsta),T1D(1,jsta),Q1D(1,jsta),EGRID4(1,jsta))
+            CALL CALRH(P1D(1,jsta),T1D(1,jsta),Q1D(1,jsta),EGRID4(1,jsta))
 
-              allocate (RH3D(im,jsta_2l:jend_2u,lm))
 !$omp parallel do private(i,j)
               DO J=JSTA,JEND
                 DO I=1,IM
@@ -1601,7 +1601,7 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
               ENDIF
             ENDIF
 
-!
+!     
 !           DEWPOINT ON MDL SURFACES.
             IF (IGET(004)>0) THEN
              IF (LVLS(L,IGET(004))>0) THEN
@@ -1639,7 +1639,7 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
                endif
              ENDIF
             ENDIF
-!
+!     
 !           SPECIFIC HUMIDITY ON MDL SURFACES.
             IF (IGET(005)>0) THEN
              IF (LVLS(L,IGET(005))>0) THEN
@@ -1665,7 +1665,7 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
               endif
              ENDIF
             ENDIF
-!
+!     
 !           WATER VAPOR MIXING RATIO ON MDL SURFACES.
             IF (IGET(750)>0) THEN
              IF (LVLS(L,IGET(750))>0) THEN
@@ -1695,7 +1695,7 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
                endif
              ENDIF
             ENDIF
-!
+!     
 !           MOISTURE CONVERGENCE ON MDL SURFACES.
 !           write(0,*)'iget083=',iget(083),' l=',l
             LLL = 0
@@ -1740,7 +1740,7 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
                ENDIF
              ENDIF
             ENDIF
-!
+!     
 !           U AND/OR V WIND ON MDL SURFACES.
 !MEB needs to be modified to do u at u-points and v at v-points
             IF (IGET(007)>0.OR.IGET(008)>0) THEN
@@ -1777,7 +1777,7 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
               endif
              ENDIF
             ENDIF
-!
+!     
 !           OMEGA ON MDL SURFACES.
             IF (IGET(009)>0) THEN
              IF (LVLS(L,IGET(009))>0) THEN
@@ -1802,7 +1802,7 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
                endif
              ENDIF
             ENDIF
-!
+!     
 !           W ON MDL SURFACES.
             IF (IGET(264)>0) THEN
              IF (LVLS(L,IGET(264))>0) THEN
@@ -1827,7 +1827,7 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
                endif
              ENDIF
             ENDIF
-!
+!     
 !           ABSOLUTE VORTICITY ON MDL SURFACES.
             IF (IGET(010)>0) THEN
              IF (LVLS(L,IGET(010))>0) THEN
@@ -1864,7 +1864,7 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
                endif
              ENDIF
             ENDIF
-!
+!     
 !           GEOSTROPHIC STREAMFUNCTION ON MDL SURFACES.
             IF (IGET(084)>0) THEN
              IF (LVLS(L,IGET(084))>0) THEN
@@ -1896,7 +1896,7 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
                endif
              ENDIF
             ENDIF
-!
+!     
 !           TURBULENT KINETIC ENERGY ON MDL SURFACES.
             IF (IGET(011)>0) THEN
                IF (LVLS(L,IGET(011))>0) THEN
@@ -1921,7 +1921,7 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
                endif
                ENDIF
             ENDIF
-!
+!    
 !           CLOUD WATER CONTENT
 !HC            IF (IGET(124)>0) THEN
 !HC             IF (LVLS(L,IGET(124))>0) THEN
@@ -1936,7 +1936,7 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
 !HC              CALL GRIBIT(IGET(124),L,GRID1,IM,JM)
 !HC             ENDIF
 !HC            ENDIF
-!
+!     
 !           CLOUD ICE CONTENT.
 !commented out until QICE is brought into post
 !           IF (IGET(125)>0) THEN
@@ -1950,9 +1950,9 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
 !              CALL GRIBIT(IGET(125),L,GRID1,IM,JM)
 !            ENDIF
 !           ENDIF
-!
+!     
 !           CLOUD FRACTION
-!
+!     
 !commented out until CFRC is brought into post
 !           IF (IGET(145)>0) THEN
 !            IF (LVLS(L,IGET(145))>0) THEN
@@ -1965,7 +1965,7 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
 !              CALL GRIBIT(IGET(145),L,GRID1,IM,JM)
 !            ENDIF
 !           ENDIF
-!
+!     
 !           TEMPERATURE TENDENCY DUE TO RADIATIVE FLUX CONVERGENCE
 !commented out until TTND is brought into post
            IF (IGET(140)>0) THEN
@@ -1991,7 +1991,7 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
               endif
              ENDIF
            ENDIF
-!
+!     
 !           TEMPERATURE TENDENCY DUE TO SHORT WAVE RADIATION.
 !commented out until RSWTT is brought into post
            IF (IGET(040)>0) THEN
@@ -2017,7 +2017,7 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
               endif
             ENDIF
            ENDIF
-!
+!     
 !           TEMPERATURE TENDENCY DUE TO LONG WAVE RADIATION.
 !commented out until RLWTT is brought into post
            IF (IGET(041)>0) THEN
@@ -2044,7 +2044,7 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
              ENDIF
            ENDIF
 !
-!
+!     
 !        PROCESS NEXT MDL LEVEL.
 !
 !           LATENT HEATING FROM GRID SCALE RAIN/EVAP. (TIME AVE)
@@ -2068,13 +2068,13 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
                ENDDO
                ID(1:25) = 0
                ITHEAT     = INT(THEAT)
-               IF (ITHEAT /= 0) THEN
-                 IFINCR     = MOD(IFHR,ITHEAT)
-               ELSE
-                 IFINCR=0
-               ENDIF
+	       IF (ITHEAT /= 0) THEN
+                IFINCR     = MOD(IFHR,ITHEAT)
+	       ELSE
+	        IFINCR=0
+	       END IF
                ID(19) = IFHR
-       IF(IFMIN >= 1)ID(19)=IFHR*60+IFMIN
+	       IF(IFMIN >= 1)ID(19)=IFHR*60+IFMIN
                ID(20) = 3
                IF (IFINCR==0) THEN
                   ID(18) = IFHR-ITHEAT
@@ -2124,13 +2124,13 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
                ENDDO
                ID(1:25) = 0
                ITHEAT     = INT(THEAT)
-               IF (ITHEAT /= 0) THEN
-                 IFINCR     = MOD(IFHR,ITHEAT)
-               ELSE
-                 IFINCR=0
-               ENDIF
+	       IF (ITHEAT /= 0) THEN
+                IFINCR     = MOD(IFHR,ITHEAT)
+	       ELSE
+	        IFINCR=0
+	       END IF
                ID(19) = IFHR
-               IF(IFMIN >= 1)ID(19)=IFHR*60+IFMIN
+	       IF(IFMIN >= 1)ID(19)=IFHR*60+IFMIN
                ID(20) = 3
                IF (IFINCR==0) THEN
                   ID(18) = IFHR-ITHEAT
@@ -2291,7 +2291,7 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
                  GRID1(I,J) = DUST(I,J,LL,1)*RHOMID(I,J,LL) !lzhang ug/kg-->ug/m3
                ELSE
                  GRID1(I,J) = spval
-               ENDIF
+               ENDIF               
                ENDDO
                ENDDO
                if(grib=="grib2") then
@@ -2878,7 +2878,7 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
                     GRID1(I,J) = MAX( GRID1(I,J), REF_10CM(I,J,L) )
                   ENDDO
                 ENDDO
-              ENDDO
+              ENDDO 
             ELSE
 !$omp parallel do private(i,j)
               DO J=JSTA,JEND
@@ -3210,7 +3210,7 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
 !HC July 2012, per communication with Ferrier, modify post to add convective 
 !   contribution to visibility for all non GFS models
 
-!          IF(MODELNAME/='GFS')THEN
+!           IF(MODELNAME/='GFS')THEN
            IF(imp_physics/=99)THEN
             IF (CPRATE(I,J) > 0. .and. CPRATE(I,J) < SPVAL &
                 .and. PMID(I,J,LM) < spval .and. QR1(I,J) < spval) THEN
@@ -3220,7 +3220,7 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
                TERM1=(T(I,J,LM)/PMID(I,J,LM))**0.4167
                TERM2=(T1D(I,J)/P1D(I,J))**0.5833
                TERM3=RAINRATE**0.8333
-               QROLD=1.2*QR1(I,J)
+	       QROLD=1.2*QR1(I,J)
                QR1(I,J)=QR1(I,J)+RAINCON*TERM1*TERM2*TERM3
                IF (SR(I,J) > 0. .and. QS1(I,J) < SPVAL) THEN
                   SNORATE=SR(I,J)*CPRATE(I,J)*RDTPHS
@@ -3231,9 +3231,9 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
                   QS1(I,J)=QS1(I,J)+SNOCON*TERM1*TERM2*TERM3
                ENDIF
             ENDIF
-           ELSE !imp_physics is 99
+	   ELSE !imp_physics is 99 
 ! Zhao microphysics option in NMMB is identified as 9
-! However, microphysics option 9 in WRF is Milbrandt-Yau 2-moment scheme.
+! However, microphysics option 9 in WRF is Milbrandt-Yau 2-moment scheme.   
 ! 3/14/2013: Ratko comitted NEMS change (r26409) to change mp_physics from 9 to 99 for Zhao
 ! scheme used with NMMB.  Post is changing accordingly
 !	   IF(imp_physics==99)THEN ! use rain rate for visibility
@@ -3245,7 +3245,7 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
                TERM1=(T(I,J,LM)/PMID(I,J,LM))**0.4167
                TERM2=(T1D(I,J)/P1D(I,J))**0.5833
                TERM3=RAINRATE**0.8333
-               QROLD=1.2*QR1(I,J)
+	       QROLD=1.2*QR1(I,J)
                QR1(I,J)=QR1(I,J)+RAINCON*TERM1*TERM2*TERM3
                IF (SR(I,J) > 0.) THEN
                   SNORATE=SR(I,J)*PREC(I,J)*RDTPHS
@@ -3256,7 +3256,7 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
                   QS1(I,J)=QS1(I,J)+SNOCON*TERM1*TERM2*TERM3
                ENDIF
             ENDIF
-           ENDIF
+           END IF
 
           ENDDO
         ENDDO
@@ -3274,15 +3274,15 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
 !     +,QS1(ii,jj),T1D(ii,jj),P1D(ii,jj)
 !
 
-        DO J=JSTA,JEND
-         DO I=1,IM
-          IF(vis(i,j)/=spval.and.abs(vis(i,j))>24135.1)print*,'bad visbility'     &
-           , i,j,Q1D(i,j),QW1(i,j),QR1(i,j),QI1(i,j)                 &
-           , QS1(i,j),T1D(i,j),P1D(i,j),vis(i,j)
+	 DO J=JSTA,JEND
+	 DO I=1,IM
+	  IF(vis(i,j)/=spval.and.abs(vis(i,j))>24135.1)print*,'bad visbility'     &
+       , i,j,Q1D(i,j),QW1(i,j),QR1(i,j),QI1(i,j)                 &
+       , QS1(i,j),T1D(i,j),P1D(i,j),vis(i,j)
 
-            GRID1(I,J)=VIS(I,J)
-          ENDDO
-        ENDDO  
+         GRID1(I,J)=VIS(I,J)
+	END DO
+	END DO  
         if(grib=="grib2") then
          cfld=cfld+1
          fld_info(cfld)%ifld=IAVBLFLD(IGET(180))
@@ -3436,12 +3436,11 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
          endif
        ENDIF
 !     
-!     ASYMPTOTIC AND FREE ATMOSPHERE MASTER LENGTH SCALE (AFEL), PLUS
+!     ASYMPTOTIC AND FREE ATMOSPHERE MASTER LENGTH SCALE (EL), PLUS
 !     GRADIENT RICHARDSON NUMBER.
 !
       IF ( (IGET(111)>0) .OR. (IGET(146)>0) .OR.         &
            (IGET(147)>0) ) THEN
-        ALLOCATE(afel(IM,JSTA_2L:JEND_2U,LM))
 !     
 !        COMPUTE ASYMPTOTIC MASTER LENGTH SCALE.
          CALL CLMAX(EL0(1,jsta),EGRID2(1,jsta),EGRID3(1,jsta),EGRID4(1,jsta),EGRID5(1,jsta))
@@ -3471,7 +3470,7 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
             DO L=1,LM
               DO J=JSTA,JEND
                 DO I=1,IM
-                   AFEL(I,J,L) = D00
+                   EL(I,J,L) = D00
                 ENDDO
               ENDDO
             ENDDO
@@ -3482,22 +3481,19 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
               DO L=1,LM
                DO J=JSTA,JEND
                DO I=1,IM
-                 AFEL(I,J,L)=EL_PBL(I,J,L)  !NOW EL COMES OUT OF WRF NMM
+                 EL(I,J,L)=EL_PBL(I,J,L)  !NOW EL COMES OUT OF WRF NMM
                ENDDO
                ENDDO
               ENDDO
             END IF
-!
+!     
 !           COMPUTE GRADIENT RICHARDSON NUMBER IF REQUESTED.
-!
-            IF ( (IGET(111)>0) ) then
-              ALLOCATE(RICHNO (IM,JSTA_2L:JEND_2U,LM))
-              CALL CALRCH(AFEL,RICHNO)
-            endif
+!     
+            IF ( (IGET(111)>0) ) CALL CALRCH(EL,RICHNO)
 !
 !           LOOP OVER MDL LAYERS.
             DO 200 L = 1,LM
-!
+!     
 !              POST MIXING LENGTH.
 !
             IF (IGET(146)>0) THEN
@@ -3508,7 +3504,7 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
 !$omp  parallel do private(i,j)
                DO J=JSTA,JEND
                  DO I=1,IM
-                   GRID1(I,J) = AFEL(I,J,LL)
+                   GRID1(I,J) = EL(I,J,LL)
                  ENDDO
                ENDDO
                if(grib=="grib2") then
@@ -3525,7 +3521,7 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
                endif
              ENDIF
             ENDIF
-!
+!     
 !              POST GRADIENT RICHARDSON NUMBER.
 !
             IF(L < LM)THEN
@@ -3559,28 +3555,28 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
 !
          ENDIF
       ENDIF
-!
+!     
 !           COMPUTE PBL HEIGHT BASED ON RICHARDSON NUMBER
-!
+!     
             IF ( (IGET(289)>0) .OR. (IGET(389)>0) .OR. (IGET(454)>0)   &
-            .OR. (IGET(245)>0)  .or. IGET(464)>0 .or. IGET(467)>0      &
+            .OR. (IGET(245)>0)  .or. IGET(464)>0 .or. IGET(467)>0  &
             .or. IGET(470)>0 ) THEN
-! should only compute pblri if pblh from model is not computed based on Ri
+! should only compute pblri if pblh from model is not computed based on Ri 
 ! post does not yet read pbl scheme used by model.  Will do this soon
 ! For now, compute PBLRI for non GFS models.
               IF(MODELNAME  ==  'GFS')THEN
                 PBLRI=PBLH
               ELSE
                CALL CALPBL(PBLRI)
-              ENDIF
-            ENDIF
+              END IF
+            END IF  
 
             IF (IGET(289) > 0) THEN
 !$omp parallel do private(i,j)
                 DO J=JSTA,JEND
                   DO I=1,IM
                      GRID1(I,J) = PBLRI(I,J)
-!                    PBLH(I,J)  = PBLRI(I,J)
+!                    PBLH(I,J) = PBLRI(I,J)
                   ENDDO
                 ENDDO
                 if(grib=="grib2") then
@@ -3609,8 +3605,8 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
                 ELSE
                   EGRID3(I,J) = spval
                 ENDIF
-                ENDDO
-              ENDDO
+                END DO
+              END DO  
 ! compute U and V separately because they are on different locations for B grid
               CALL H2U(EGRID3(1:im,JSTA_2L:JEND_2U),EGRID4)
 !$omp parallel do private(i,j)
@@ -3686,9 +3682,9 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
 !                  else
 !                    exit vert_loopu
                    endif
-                   endif
+                   endif 
                   end do
-                 end do
+                 end do 
                  if(HCOUNT<1)exit vert_loopv
                 ENDDO vert_loopv
 !$omp parallel do private(i,j)
@@ -3715,7 +3711,7 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
                        EGRID3(I,J) = sqrt((EGRID1(I,J)*EGRID1(I,J)+EGRID2(I,J)*EGRID2(I,J)))
                      ELSe
                        EGRID3(I,J) = SPVAL
-                     ENDIF
+                     END IF
 
 !         if (mod(I,20) == 0 .and. mod(J,20) == 0) then
 !         write(0,*) 'wind speed ', I,J, EGRID1(I,J)
@@ -3745,8 +3741,8 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
                       datapd(i,j,cfld) = GRID2(i,jj)
                     enddo
                   enddo
-                endif
-               ENDIF
+                endif 
+               END IF
             ENDIF
 !
 !       COMPUTE VENTILATION RATE (TRANSPORT WIND SPEED * MIXED LAYER HEIGHT)
@@ -3790,7 +3786,7 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
 
 
             ENDIF
-!
+!	    
 ! CALCULATE Gust based on Ri PBL
       IF (IGET(245)>0 .or. IGET(464)>0 .or. IGET(467)>0.or. IGET(470)>0) THEN
         IF(MODELNAME=='RAPR') THEN
@@ -3841,8 +3837,8 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
           IF(HGT >  PBLHOLD+ZSFC)THEN
            LPBL(I,J)=L+1
            IF(LPBL(I,J)>=LP1) LPBL(I,J) = LM
-           EXIT loopL
-          ENDIF
+           EXIT loopL 
+          END IF
          ENDDO loopL
 
          else
@@ -3864,7 +3860,7 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
 !      	 print*,'big gust at ',i,j
            GRID1(I,J) = GUST(I,J)
          ENDDO
-       ENDDO
+       ENDDO      
        if(grib=='grib2') then
         cfld=cfld+1
         fld_info(cfld)%ifld=IAVBLFLD(IGET(245))
@@ -3877,10 +3873,10 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
         enddo
        endif
       ENDIF
-      ENDIF
-!
+      END IF
+!     
 !           COMPUTE PBL REGIME BASED ON WRF version of BULK RICHARDSON NUMBER
-!
+!     
 
             IF (IGET(344)>0) THEN
                 allocate(PBLREGIME(im,jsta_2l:jend_2u))
@@ -3926,9 +3922,9 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
                 IF(DBZ(I,J,L) > 18.3) then
                   GRID1(I,J) = ZMID(I,J,L)
                   EXIT
-                ENDIF
+                END IF
               ENDDO
-            ENDIF
+            END IF
  201        CONTINUE
 !           if(grid1(i,j)<0.)print*,'bad echo top',  &
 !    +         i,j,grid1(i,j),dbz(i,j,1:lm)	       
@@ -3946,7 +3942,7 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
          enddo
         endif
       ENDIF
-!
+!     
 !
 ! COMPUTE NCAR GTG turbulence
       IF(IGET(464)>0 .or. IGET(467)>0 .or. IGET(470)>0)THEN
@@ -3955,16 +3951,13 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
 !        if(me == 0) print*,'sending input to GTG i,j,hgt,gust',i,j,ZINT(i,j,LP1),gust(i,j)
 
         ! Use the existing 3D local arrays as cycled variables
-        if (.not. allocated(afel)) ALLOCATE(afel(IM,JSTA_2L:JEND_2U,LM))
-        AFEL = SPVAL
-        if (.not. allocated(richno)) ALLOCATE(RICHNO(IM,JSTA_2L:JEND_2U,LM))
-        RICHNO = SPVAL
+        EL=SPVAL
+        RICHNO=SPVAL
 
-        call gtg_algo(im,jm,lm,jsta,jend,jsta_2L,jend_2U,                      &
-                      uh,vh,wh,zmid,pmid,t,q,qqw,qqr,qqs,qqg,qqi,              &
-                      ZINT(1:IM,JSTA_2L:JEND_2U,LP1),pblh,sfcshx,sfclhx,ustar, &
-                      z0,gdlat,gdlon,dx,dy,u10,v10,GUST,avgprec,sm,sice,catedr,&
-                      mwt,AFEL,gtg,RICHNO,item)
+        call gtg_algo(im,jm,lm,jsta,jend,jsta_2L,jend_2U,&
+        uh,vh,wh,zmid,pmid,t,q,qqw,qqr,qqs,qqg,qqi,&
+        ZINT(1:IM,JSTA_2L:JEND_2U,LP1),pblh,sfcshx,sfclhx,ustar,&
+        z0,gdlat,gdlon,dx,dy,u10,v10,GUST,avgprec,sm,sice,catedr,mwt,EL,gtg,RICHNO,item)
 
         i=IM/2
         j=jend ! 321,541
@@ -4065,10 +4058,10 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
             end if
             CALL ICING_ALGO(i,j,pmid(i,j,1:lm),T(i,j,1:lm),RH3D(i,j,1:lm)   &
                 ,ZMID(i,j,1:lm),OMGA(i,j,1:lm),wh(i,j,1:lm)   &
-                ,q(i,j,1:lm),CWM(I,J,1:lm),qqw(i,j,1:lm),qqi(i,j,1:lm)      &
+                ,q(i,j,1:lm),CWM(I,J,1:lm),qqw(i,j,1:lm),qqi(i,j,1:lm)   &
                 ,qqr(i,j,1:lm),qqs(i,j,1:lm),qqg(i,j,1:lm)    &
                 ,lm,gdlat(i,j),gdlon(i,j),zint(i,j,lp1)                     &
-                ,prec(i,j),cprate(i,j),cape(i,j),cin(i,j)                   &
+                ,prec(i,j),cprate(i,j),cape(i,j),cin(i,j)                &
                 ,icing_gfip(i,j,1:lm),icing_gfis(i,j,1:lm))
 !           if(gdlon(i,j)>=274. .and. gdlon(i,j)<=277. .and.  gdlat(i,j)>=42. &
 !           .and. gdlat(i,j)<=45.)then
@@ -4078,7 +4071,7 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
 !             print*,l,zmid(i,j,l),T(i,j,l),rh3d(i,j,l),cwm(i,j,l)  &
 !             ,omga(i,j,l),icing_gfip(i,j,l),icing_gfis(i,j,l)
 !            end do
-!           endif
+!           end if
           ENDDO
         ENDDO
 ! Chuang: Change to output isobaric NCAR icing
@@ -4095,12 +4088,10 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
 !	end do  
       ENDIF
 
-      if (allocated(pblri))  DEALLOCATE(pblri)
-      if (allocated(afel))   DEALLOCATE(afel)
-      if (allocated(richno)) DEALLOCATE(RICHNO)
-      if (allocated(rh3d))   deallocate(rh3d)
-!
+      DEALLOCATE(EL, RICHNO, PBLRI)
+      if (allocated(rh3d)) deallocate(rh3d)
+!     
 !     END OF ROUTINE.
-!
+!     
       RETURN
       END

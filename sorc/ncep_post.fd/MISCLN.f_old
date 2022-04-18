@@ -95,10 +95,10 @@
                             rhmin, rgamog, tfrz, small, g
       use ctlblk_mod, only: grib, cfld, fld_info, datapd, im, jsta, jend, jm, jsta_m, jend_m, &
                             nbnd, nbin_du, lm, htfd, spval, pthresh, nfd, petabnd, me,&
-                            jsta_2l, jend_2u, MODELNAME, SUBMODELNAME, gocart_on
-      use rqstfld_mod,  only: iget, lvls, id, iavblfld, lvlsxml
+                            jsta_2l, jend_2u, MODELNAME, SUBMODELNAME
+      use rqstfld_mod, only: iget, lvls, id, iavblfld, lvlsxml
       use grib2_module, only: pset
-      use upp_physics,  only: FPVSNEW,CALRH_PW,CALCAPE,CALCAPE2,TVIRTUAL
+      use upp_physics, only: FPVSNEW,CALRH_PW,CALCAPE,CALCAPE2,TVIRTUAL
       use gridspec_mod, only: gridtype
 !- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
        implicit none
@@ -769,12 +769,8 @@
 
          ALLOCATE(T7D(IM,JSTA:JEND,NFD), Q7D(IM,JSTA:JEND,NFD),    &
                   U7D(IM,JSTA:JEND,NFD), V6D(IM,JSTA:JEND,NFD),    &
-                  P7D(IM,JSTA:JEND,NFD), ICINGFD(IM,JSTA:JEND,NFD))
-         if (gocart_on) then
-           allocate(AERFD(IM,JSTA:JEND,NFD,NBIN_DU))
-         else
-           allocate(AERFD(1,1,1,1))
-         endif
+                  P7D(IM,JSTA:JEND,NFD), ICINGFD(IM,JSTA:JEND,NFD) &
+                 ,AERFD(IM,JSTA:JEND,NFD,NBIN_DU))
 
 !
 !     DETERMINE WHETHER TO DO MSL OR AGL FD LEVELS
@@ -803,33 +799,33 @@
            IF (IGET(577)>0) then
             if(LVLS(IFD,IGET(577))>0) ITYPEFDLVL(IFD)=2
            ENDIF
-           IF (IGET(451)>0) THEN
-           IF (LVLS(IFD,IGET(451))>1) ITYPEFDLVL(IFD)=2
-           ENDIF
+	   IF (IGET(451)>0) THEN
+	    IF (LVLS(IFD,IGET(451))>1) ITYPEFDLVL(IFD)=2
+	   ENDIF
            IF (IGET(578)>0) then
             if(LVLS(IFD,IGET(578))>0) ITYPEFDLVL(IFD)=2
            ENDIF
-
-           IF (IGET(580)>0) then
+	   
+	   IF (IGET(580)>0) then
             if(LVLS(IFD,IGET(580))>1) ITYPEFDLVL(IFD)=2
            ENDIF
-           IF (IGET(587)>0) then
+	   IF (IGET(587)>0) then
             if(LVLS(IFD,IGET(587))>0) ITYPEFDLVL(IFD)=2
            ENDIF
 
-           IF (IGET(601)>0) THEN
+	   IF (IGET(601)>0) THEN
             IF (LVLS(IFD,IGET(601))>1) ITYPEFDLVL(IFD)=2
            ENDIF
-           IF (IGET(602)>0) THEN
+	   IF (IGET(602)>0) THEN
             IF (LVLS(IFD,IGET(602))>1) ITYPEFDLVL(IFD)=2
            ENDIF
-           IF (IGET(603)>0) THEN
+	   IF (IGET(603)>0) THEN
             IF (LVLS(IFD,IGET(603))>1) ITYPEFDLVL(IFD)=2
            ENDIF
-           IF (IGET(604)>0) THEN
+	   IF (IGET(604)>0) THEN
             IF (LVLS(IFD,IGET(604))>1) ITYPEFDLVL(IFD)=2
            ENDIF
-           IF (IGET(605)>0) THEN
+	   IF (IGET(605)>0) THEN
             IF (LVLS(IFD,IGET(605))>1) ITYPEFDLVL(IFD)=2
            ENDIF
 
@@ -1078,7 +1074,7 @@
 !
 !  ADD FD LEVEL DUST/ASH (GOCART)
             IF (IGET(601)>0) THEN                      ! DUST 1
-              IF (LVLS(IFD,IGET(601))>0) THEN
+	      IF (LVLS(IFD,IGET(601))>0) THEN
 !$omp parallel do private(i,j)
 	       DO J=JSTA,JEND
 	       DO I=1,IM

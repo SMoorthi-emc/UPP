@@ -139,7 +139,7 @@
                                              QG1,    refl1km, refl4km, RH, GUST, NRAIN1,Zm10c
 !                                            T700,   TH700   
 !
-      REAL, ALLOCATABLE :: EL(:,:,:),RICHNO(:,:,:) ,PBLRI(:,:),  PBLREGIME(:,:)
+      REAL, ALLOCATABLE :: AFEL(:,:,:), RICHNO(:,:,:), PBLRI(:,:), PBLREGIME(:,:)
 !
       integer I,J,L,Lctop,LLMH,IICE,LL,II,JJ,IFINCR,ITHEAT,NC,NMOD,LLL  &
              ,iz1km,iz4km, LCOUNT, HCOUNT, ITYPE, item
@@ -3440,8 +3440,8 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
 !     GRADIENT RICHARDSON NUMBER.
 !
       IF ( (IGET(111)>0) .OR. (IGET(146)>0) .OR.         &
-        ALLOCATE(afel(IM,JSTA_2L:JEND_2U,LM))
            (IGET(147)>0) ) THEN
+        ALLOCATE(afel(IM,JSTA_2L:JEND_2U,LM))
 !     
 !        COMPUTE ASYMPTOTIC MASTER LENGTH SCALE.
          CALL CLMAX(EL0(1,jsta),EGRID2(1,jsta),EGRID3(1,jsta),EGRID4(1,jsta),EGRID5(1,jsta))
@@ -3964,7 +3964,7 @@ refl_adj:                   IF(REF_10CM(I,J,L) <= DBZmin) THEN
                       uh,vh,wh,zmid,pmid,t,q,qqw,qqr,qqs,qqg,qqi,              &
                       ZINT(1:IM,JSTA_2L:JEND_2U,LP1),pblh,sfcshx,sfclhx,ustar, &
                       z0,gdlat,gdlon,dx,dy,u10,v10,GUST,avgprec,sm,sice,catedr,&
-                      mwt,EL,gtg,RICHNO,item)
+                      mwt,AFEL,gtg,RICHNO,item)
 
         i=IM/2
         j=jend ! 321,541

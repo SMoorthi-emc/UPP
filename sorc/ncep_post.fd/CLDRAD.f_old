@@ -216,7 +216,7 @@
 
 !  --- aerosol optical properties mapped onto specified spectral bands
 !   - relative humidity independent aerosol optical properties: du
-!     real (kind=kind_phys)  :: extrhi(KCM1,NBDSW)         ! extinction coefficient
+      real (kind=kind_phys)  :: extrhi(KCM1,NBDSW)         ! extinction coefficient
 
 !   - relative humidity dependent aerosol optical properties: oc, bc, su, ss001-005
       real (kind=kind_phys)  :: extrhd(KRHLEV,KCM2,NBDSW)  ! extinction coefficient
