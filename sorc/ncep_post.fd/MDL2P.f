@@ -173,15 +173,17 @@
           enddo
         enddo
       endif
-      if (.not. allocated(smokesl)) allocate(smokesl(im,jm,nbin_sm))
+      IF (IGET(738) > 0) THEN
+        if (.not. allocated(smokesl)) allocate(smokesl(im,jm,nbin_sm))
 !$omp parallel do private(i,j,l)
-      do l=1,nbin_sm
-        do j=1,jm
-          do i=1,im
-             SMOKESL(i,j,l)  = SPVAL
+        do l=1,nbin_sm
+          do j=1,jm
+            do i=1,im
+              SMOKESL(i,j,l) = SPVAL
+            enddo
           enddo
         enddo
-      enddo
+      endif
 !     id(:) = -1
 !     
 !     SET TOTAL NUMBER OF POINTS ON OUTPUT GRID.
@@ -372,9 +374,11 @@
                      IF(DUST(I,J,1,K) < SPVAL) DUSTSL(I,J,K) = DUST(I,J,1,K)
                    ENDDO
                  endif
-                 DO K = 1, NBIN_SM
-                   IF(SMOKE(I,J,1,K) < SPVAL) SMOKESL(I,J,K)=SMOKE(I,J,1,K)
-                 ENDDO
+                 IF (IGET(738) > 0) THEN
+                   DO K = 1, NBIN_SM
+                     IF(SMOKE(I,J,1,K) < SPVAL) SMOKESL(I,J,K) = SMOKE(I,J,1,K)
+                   ENDDO
+                 endif
 
 ! only interpolate GFS d3d fields when  reqested
 !          if(iostatusD3D ==0 .and. d3d_on)then
@@ -535,10 +539,12 @@
                      DUSTSL(I,J,K) = DUST(I,J,LL,K) + (DUST(I,J,LL,K)-DUST(I,J,LL-1,K))*FACT
                    ENDDO
                  endif
-                 DO K = 1, NBIN_SM
-                   IF(SMOKE(I,J,LL,K) < SPVAL .AND. SMOKE(I,J,LL-1,K) < SPVAL)   &
-                   SMOKESL(I,J,K) = SMOKE(I,J,LL,K) + (SMOKE(I,J,LL,K)-SMOKE(I,J,LL-1,K))*FACT
-                 ENDDO
+                 IF (IGET(738) > 0) THEN
+                   DO K = 1, NBIN_SM
+                     IF(SMOKE(I,J,LL,K) < SPVAL .AND. SMOKE(I,J,LL-1,K) < SPVAL)   &
+                     SMOKESL(I,J,K) = SMOKE(I,J,LL,K) + (SMOKE(I,J,LL,K)-SMOKE(I,J,LL-1,K))*FACT
+                   ENDDO
+                 endif
 
 ! only interpolate GFS d3d fields when  == ested
 !          if(iostatusD3D==0)then
@@ -3905,9 +3911,10 @@
         ENDIF  
       ENDIF
 !
-if(allocated(d3dsl))   deallocate(d3dsl)
-if(allocated(dustsl))  deallocate(dustsl)
-if(allocated(smokesl)) deallocate(smokesl)
+      if (allocated(d3dsl))   deallocate(d3dsl)
+      if (allocated(dustsl))  deallocate(dustsl)
+      if (allocated(smokesl)) deallocate(smokesl)
+
 !     END OF ROUTINE.
 !
       RETURN
