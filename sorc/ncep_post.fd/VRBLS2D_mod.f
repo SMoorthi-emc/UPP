@@ -48,7 +48,7 @@
       ,REFDM10C_MAX(:,:),HAIL_MAX2D(:,:),HAIL_MAXK1(:,:)                     &
       ,HAIL_MAXHAILCAST(:,:)                                                 &
       ,NCI_LTG(:,:),NCA_LTG(:,:),NCI_WQ(:,:),NCA_WQ(:,:)                     &
-      ,NCI_REFD(:,:),NCA_REFD(:,:),RAINC_BUCKET1(:,:),RAINNC_BUCKET1(:,:)   &
+      ,NCI_REFD(:,:),NCA_REFD(:,:),RAINC_BUCKET1(:,:),RAINNC_BUCKET1(:,:)    &
       ,RAINC_BUCKET(:,:),RAINNC_BUCKET(:,:),SNOW_BUCKET(:,:)                 &
       ,GRAUP_BUCKET(:,:),PCP_BUCKET(:,:),ACGRAUP(:,:),ACFRAIN(:,:)           &
       ,SNOW_BUCKET1(:,:),GRAUP_BUCKET1(:,:),PCP_BUCKET1(:,:)                 &
@@ -62,7 +62,7 @@
       ,LWP(:,:),IWP(:,:)                                                     &
       ,INT_SMOKE(:,:),INT_AOD(:,:)                                           &
 ! add new fields for GFS
-      ,SFCUX(:,:),SFCVX(:,:),SFCUXI(:,:), SFCVXI(:,:),AVGALBEDO(:,:),AVGCPRATE(:,:)                   &
+      ,SFCUX(:,:),SFCVX(:,:),SFCUXI(:,:), SFCVXI(:,:),AVGALBEDO(:,:),AVGCPRATE(:,:) &
       ,AVGPREC(:,:),PTOP(:,:),PBOT(:,:),AVGCFRACH(:,:)                       &
       ,AVGCFRACM(:,:),AVGCFRACL(:,:),AVGTCDC(:,:)                            &
       ,AUVBIN(:,:),AUVBINC(:,:)                                              &
@@ -79,13 +79,13 @@
       ,avisbeamswin(:,:),avisdiffswin(:,:),airbeamswin(:,:)                  &
       ,airdiffswin(:,:),snowfall(:,:),acond(:,:),edir(:,:),ecan(:,:) &
       ,etrans(:,:),esnow(:,:),avgedir(:,:),avgecan(:,:),avgetrans(:,:)&
-      ,avgesnow(:,:),avgpotevp(:,:),avgprec_cont(:,:),avgcprate_cont(:,:)&
+      ,avgesnow(:,:),avgpotevp(:,:),avgprec_cont(:,:),avgcprate_cont(:,:)    &
       ,ti(:,:),aod550(:,:),du_aod550(:,:),ss_aod550(:,:),su_aod550(:,:)      &
       ,bc_aod550(:,:),oc_aod550(:,:),landfrac(:,:),paha(:,:),pahi(:,:)       &
-      ,tecan(:,:),tetran(:,:),tedir(:,:),twa(:,:),fdnsst(:,:)
+      ,tecan(:,:),tetran(:,:),tedir(:,:),twa(:,:),fdnsst(:,:),pwat(:,:)
       integer, allocatable :: IVGTYP(:,:),ISLTYP(:,:),ISLOPE(:,:) &
       ,IEQL(:,:)
-      
+ 
 ! Add 2d aerosol diagnosis fields for GOCART (NGAC)
       real, allocatable ::                                                   &
        DUSMASS(:,:),DUCMASS(:,:),DUSMASS25(:,:),DUCMASS25(:,:)               &
@@ -95,7 +95,7 @@
       ,SSSMASS(:,:),SSCMASS(:,:),SSSMASS25(:,:),SSCMASS25(:,:)               &
       ,DUSTCB(:,:),SSCB(:,:),OCCB(:,:),BCCB(:,:),SULFCB(:,:)                 &
       ,DUSTALLCB(:,:),SSALLCB(:,:),DUSTPM(:,:),SSPM(:,:),PP25CB(:,:)         &
-      ,PP10CB(:,:)!lzhang, add for FV3-Chem
- 
+      ,DUSTPM10(:,:),PP10CB(:,:),maod(:,:)!lzhang, add for FV3-Chem
+
 !
       end module vrbls2d
