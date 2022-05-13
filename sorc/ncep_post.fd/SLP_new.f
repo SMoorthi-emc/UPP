@@ -524,14 +524,14 @@ ENDDO LOOP320
             TVRT      = T(I,J,LLMH)*(H1+D608*Q(I,J,LLMH))
             DIS       = ZINT(I,J,LLMH+1)-ZINT(I,J,LLMH)+0.5*ZINT(I,J,LLMH+1)
             TLYR      = TVRT-DIS*G*SLOPE
-            PSLP(I,J) = PINT(I,J,LLMH+1)*EXP(ZINT(I,J,LLMH+1)*G              &  
+            PSLP(I,J) = PINT(I,J,LLMH+1)*EXP(ZINT(I,J,LLMH+1)*G       &  
                          /(RD*TLYR))
-!           if(i==ii.and.j==jj)print*,'Debug:PSFC,zsfc,TLYR,PSLPA3='
-!           1,PINT(I,J,LLMH+1),ZINT(I,J,LLMH+1),TLYR,PSLP(I,J)
+!           if(i==ii.and.j==jj)print*,'Debug:PSFC,zsfc,TLYR,PSLPA3='  &
+!           ,PINT(I,J,LLMH+1),ZINT(I,J,LLMH+1),TLYR,PSLP(I,J)
           ELSE
             TLYR=TPRES(I,J,LP)-0.5*FIPRES(I,J,LP)*SLOPE
             PSLP(I,J)=spl(lp)/EXP(-FIPRES(I,J,LP)/(RD*TLYR))
-!           if(i==ii.and.j==jj)print*,'Debug:spl,FI,TLYR,PSLPA3='      &
+!           if(i==ii.and.j==jj)print*,'Debug:spl,FI,TLYR,PSLPA3='     &
 !          ,spl(lp),FIPRES(I,J,LP),TLYR,PSLP(I,J)
           END IF
           DONE(I,J) = .TRUE.
