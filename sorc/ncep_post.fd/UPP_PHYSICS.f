@@ -2012,17 +2012,30 @@
         call exch(absv(ista_2l:iend_2u,jsta_2l:jend_2u))
         call fullpole(absv(ista_2l:iend_2u,jsta_2l:jend_2u),avpoles)     
 
-        cosltemp=spval
-        if(jsta== 1) cosltemp(1:im, 1)=coslpoles(1:im,1)
-        if(jend==jm) cosltemp(1:im,jm)=coslpoles(1:im,2)
-        avtemp=spval
-        if(jsta== 1) avtemp(1:im, 1)=avpoles(1:im,1)
-        if(jend==jm) avtemp(1:im,jm)=avpoles(1:im,2)
+!$omp parallel do private(i,j)
+        do j=jsta,jend
+          do i=1,im
+            cosltemp(i,j) = spval
+            avtemp(i,J)   = spval
+          enddo
+        enddo
+        if(jsta == 1) then
+          do i=1,im
+            cosltemp(i,1) = coslpoles(i,1)
+            avtemp(i,1)   = avpoles(i,1)
+          enddo
+        endif
+        if(jend == jm) then
+          do i=1,im
+            cosltemp(i,jm) = coslpoles(i,2)
+            avtemp(i,jm)   = avpoles(i,2)
+          enddo
+        endif
         
         call poleavg(IM,JM,JSTA,JEND,SMALL,cosltemp(1,jsta),SPVAL,avtemp(1,jsta))
 
-        if(jsta== 1) absv(ista:iend, 1)=avtemp(ista:iend, 1)
-        if(jend==jm) absv(ista:iend,jm)=avtemp(ista:iend,jm)
+        if(jsta == 1)  absv(ista:iend, 1) = avtemp(ista:iend, 1)
+        if(jend == jm) absv(ista:iend,jm) = avtemp(ista:iend,jm)
     
         deallocate (wrk1, wrk2, wrk3, cosl, iw, ie)
 

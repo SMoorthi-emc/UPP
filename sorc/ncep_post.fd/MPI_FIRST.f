@@ -151,7 +151,7 @@
       include 'mpif.h'
 !
       integer ierr,i,jsx,jex,isx,iex,j
-      integer size,ubound,lbound
+!     integer size,ubound,lbound
       integer isumm,isum ,ii,jj,isumm2
       integer , allocatable :: ibuff(:)
       real    , allocatable :: rbuff(:)
@@ -330,7 +330,7 @@
 
 !     allocate arrays
 
-      ibsize = ( (iend-ista) +1) *  ( (jend-jsta)+1)
+      ibsize = (iend-ista+1) * (jend-jsta+1)
       allocate(ibcoords(ista_2l:iend_2u,jsta_2l:jend_2u))
       allocate(rbcoords(ista_2l:iend_2u,jsta_2l:jend_2u))
       allocate(ibufs(ibsize))
@@ -444,20 +444,18 @@
       real,intent(inout) :: a( ista_2l:iend_2u,jsta_2l:jend_2u ), rpoles(im,2)
       real, allocatable  :: rpole(:)
 
-      integer status(MPI_STATUS_SIZE)
+!     integer status(MPI_STATUS_SIZE)
       integer ierr
-      integer size,ubound,lbound
-      integer i,ii,jj, ibl,ibu,jbl,jbu,icc,jcc 
+!     integer size,ubound,lbound
+!     integer i,ii,jj, ibl,ibu,jbl,jbu,icc,jcc 
       integer ifirst
       data ifirst/0/
-      integer iwest,ieast
-      data iwest,ieast/0,0/
+!     integer iwest,ieast
+!     data iwest,ieast/0,0/
       allocate(rpole(ista:iend))
 
-      do i=ista,iend
-        if(me <  num_procs/2 .and. jsta_2l <= 1  .and. icnt2(me) > 0) rpole(i) = a(i,1)
-        if(me >= num_procs/2 .and. jend_2u >= jm .and. icnt2(me) > 0) rpole(i) = a(i,jm)
-      end do
+      if(me <  num_procs/2 .and. jsta_2l <= 1  .and. icnt2(me) > 0) rpole(ista:iend) = a(ista:iend,1)
+      if(me >= num_procs/2 .and. jend_2u >= jm .and. icnt2(me) > 0) rpole(ista:iend) = a(ista:iend,jm)
 
       call mpi_allgatherv(rpole(ista),icnt2(me),MPI_REAL,rpoles,icnt2,idsp2,MPI_REAL, MPI_COMM_COMP,ierr)
 
