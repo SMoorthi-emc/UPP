@@ -2002,7 +2002,7 @@
               absv(i,j) = tx1(i)
             enddo
           endif
-        END DO                               ! end of J loop
+        ENDDO                               ! end of J loop
 
 !       deallocate (wrk1, wrk2, wrk3, cosl)
 ! GFS use lon avg as one scaler value for pole point
@@ -2146,8 +2146,8 @@
 !
 !     DECLARE VARIABLES.
 !     
-      REAL, dimension(ista_2l:iend_2u,jsta_2l:jend_2u,lm), intent(in)    :: UWND,VWND
-      REAL, dimension(ista:iend,jsta:jend,lm),       intent(inout) :: DIV
+      REAL, dimension(ista_2l:iend_2u,jsta_2l:jend_2u,lm), intent(in) :: UWND,VWND
+      REAL, dimension(ista:iend,jsta:jend,lm),       intent(inout)    :: DIV
       REAL, dimension(IM,2)         :: GLATPOLES, COSLPOLES, UPOLES, VPOLES, DIVPOLES
       REAL, dimension(IM,JSTA:JEND) :: COSLTEMP, DIVTEMP
 !
