@@ -53,6 +53,7 @@
 !      deallocate(rainw(im,jsta_2l:jend_2u,lm))
       deallocate(q2)
       deallocate(omga)
+      deallocate(dpres)
       deallocate(T_ADJ)
       deallocate(ttnd)
       deallocate(rswtt)
@@ -356,6 +357,7 @@
       deallocate(avgetrans)
       deallocate(avgesnow)
       deallocate(avgpotevp)
+      deallocate(aod550)
       deallocate(ti)
       deallocate(du_aod550)
       deallocate(ss_aod550)
@@ -502,7 +504,6 @@
         deallocate(ssdp)
         deallocate(sswt)
         deallocate(sssv)
-        deallocate(dpres)
         deallocate(rhomid)
 ! vrbls2d
         deallocate(dusmass)
