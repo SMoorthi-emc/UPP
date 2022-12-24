@@ -14,6 +14,7 @@
 !!   11-12-16  SARAH LU - MODIFIED TO INITIALIZE AEROSOL FIELDS
 !!   12-01-07  SARAH LU - MODIFIED TO INITIALIZE AIR DENSITY/LAYER THICKNESS
 !!   21-07-07  JESSE MENG - 2D DECOMPOSITION
+!!   22-09-22  Li(Kate) Zhang - Add new aerosols fields for UFS-Aerosols
 !!
 !! USAGE:    CALL MPI_FIRST
 !!   INPUT ARGUMENT LIST:
@@ -40,7 +41,7 @@
       use ctlblk_mod, only: me, num_procs, jm, jsta, jend, jsta_m, jsta_m2,ista,iend , &
               jend_m, jend_m2, iup, idn, icnt, im, idsp, jsta_2l, jend_2u,idsp2,icnt2, &
               jvend_2u, lm, lp1, jsta_2l, jend_2u, nsoil, nbin_du, nbin_ss,            &
-              nbin_bc, nbin_oc, nbin_su,                                               &
+              nbin_bc, nbin_oc, nbin_su, nbin_no3, nbin_nh4,                           &
               ISTA_M,IEND_M,ISTA_M2,IEND_M2, iSTA_M,IEND_M,ISTA_M2,IEND_M2,            &
               ileft,iright,ileftb,irightb,ibsize,ibsum, isxa,iexa,jsxa,jexa,           &
               icoords,ibcoords,bufs,ibufs, rbufs, rcoords,rbcoords,                    &  
